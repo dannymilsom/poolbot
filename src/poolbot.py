@@ -37,12 +37,11 @@ class PoolBot(object):
 
     def load_config(self):
         """Load the configuration settings from a YAML file."""
-        exception_message = None
         try:
             with open(self.CONFIG_FILENAME, 'r') as f:
                 self.config = yaml.load(f)
         except IOError:
-            raise MissingCongigurationException(
+            raise MissingConfigurationException(
                     'A {} file must be present in the app directory'.format(
                         self.CONFIG_FILENAME
                     )
@@ -52,7 +51,7 @@ class PoolBot(object):
             try:
                 setattr(self, setting, self.config[setting])
             except KeyError:
-                raise MissingCongigurationException(
+                raise MissingConfigurationException(
                     'Please add a {} setting to the {} file.'.format(
                         setting,
                         self.CONFIG_FILENAME

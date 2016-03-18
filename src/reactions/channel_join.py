@@ -1,6 +1,7 @@
-import re
+import requests
 
 from base import BaseReaction
+
 
 class ChannelJoinReaction(BaseReaction):
 
