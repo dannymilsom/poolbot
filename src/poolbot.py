@@ -16,7 +16,7 @@ class PoolBot(object):
     """Records pool results and much more using a custom slack bot."""
 
     CONFIG_FILENAME = 'config.yaml'
-    REQUIRED_SETTINGS = ('api_token', 'bot_id', 'server_host')
+    REQUIRED_SETTINGS = ('api_token', 'bot_id', 'server_host', 'server_token')
 
     def __init__(self):
         # load config settings from yaml file

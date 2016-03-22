@@ -3,3 +3,5 @@ api_token: <SLACK API TOKEN>
 bot_id: <BOT SLACK ID>
 
 server_host: <SERVER HOST ADDRESS>
+
+server_token: <SERVER HOST REST FRAMEWORK TOKEN>
