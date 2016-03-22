@@ -130,7 +130,10 @@ class PoolBot(object):
         storage, and cache the user objects in memory for later reference."""
         # get all users currently stored in the datastore
         player_api_url = self.generate_url('api/player/')
-        response = requests.get(player_api_url)
+        response = requests.get(
+            player_api_url,
+            headers=self.get_request_headers()
+        )
         stored_ids = [user['slack_id'] for user in response.json()]
 
         self.users = {}
@@ -162,12 +165,19 @@ class PoolBot(object):
             data={
                 'name': user_details['user']['name'],
                 'slack_id': user_details['user']['id']
-            }
+            },
+            headers=self.get_request_headers()
         )
 
     def generate_url(self, path):
         """Join the host portion of the URL with the provided path."""
         return urljoin(self.server_host, path)
+
+    def get_request_headers(self):
+        """Return a dictionary of HTTP headers to be included with a request."""
+        return {
+            'Authorization': 'Token {token}'.format(token=self.server_token)
+        }
 
 
 if __name__ == '__main__':

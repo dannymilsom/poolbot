@@ -32,6 +32,7 @@ class HeadToHeadCommand(BaseCommand):
 
         response = requests.get(
             self._generate_url(),
+            headers=self.poolbot.get_request_headers(),
             params={
                 'player1': player1,
                 'player2': player2,

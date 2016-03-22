@@ -43,7 +43,8 @@ class RecordCommand(BaseCommand):
                 'loser': defeated_player,
                 'channel': message['channel'],
                 'granny': 'grannied' in lower_text,
-            }
+            },
+            headers=self.poolbot.get_request_headers()
         )
 
         if response.status_code == 201:
