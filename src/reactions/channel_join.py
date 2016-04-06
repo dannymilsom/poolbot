@@ -11,11 +11,11 @@ class ChannelJoinReaction(BaseReaction):
         return message.get('subtype') == 'channel_join'
 
     def process_request(self, message):
-        user_id = self._find_subtype_mentions(message)
+        user_id = self._find_subtype_mentions(message)[0]
+        user_details = self.poolbot.client.api_call('users.info', user=user_id)
 
         # add the user to the users list if not already
         if user_id not in self.poolbot.users:
-            user_details = self.poolbot.client.api_call('users.info', user=user_id)
             response = requests.post(
                 self._generate_url(),
                 data={
