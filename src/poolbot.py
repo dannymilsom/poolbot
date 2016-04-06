@@ -153,7 +153,8 @@ class PoolBot(object):
                         data={
                             'name': user['name'],
                             'slack_id': user['id']
-                        }
+                        },
+                        headers=self.get_request_headers()
                     )
 
     def store_user(self, user_id):
