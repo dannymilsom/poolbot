@@ -64,8 +64,8 @@ class RecordCommand(BaseCommand):
         )
 
         if response.status_code == 201:
-            return 'Another big win for {winner}! Victory recorded in the DB.'.format(
-                winner=self.poolbot.users[message['user']]['name']
+            return 'Victory recorded for {winner}!'.format(
+                winner=self.poolbot.get_username(message['user'])
             )
         else:
             return 'Sorry, I was unable to record that result.'
