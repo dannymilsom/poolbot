@@ -43,7 +43,14 @@ class RecordCommand(BaseCommand):
 
         lower_text = message['text'].lower()
         if not any(noun in lower_text for noun in self.victory_nouns):
-            return 'Sorry, I am unable to determine the result'
+            return (
+                'Sorry, I am unable to determine the result. Record a win by '
+                'posting a message like `record beat @opponent`. You can '
+                'replace `beat` with any word from the following list:\n'
+                '`{victory_nouns}`'.format(
+                    victory_nouns = ', '.join(noun for noun in self.victory_nouns)
+                )
+            )
 
         response = requests.post(
             self._generate_url(),
