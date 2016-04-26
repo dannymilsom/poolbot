@@ -170,6 +170,12 @@ class PoolBot(object):
             headers=self.get_request_headers()
         )
 
+    def get_username(self, user_id, capitalize=True):
+        """Fetch the user name for a slack user given their ID from the in
+        memory dictionary of registered users."""
+        name = self.users.get(user_id)['name']
+        return name.title() if capitalize else name
+
     def generate_url(self, path):
         """Join the host portion of the URL with the provided path."""
         return urljoin(self.server_host, path)
