@@ -9,13 +9,6 @@ class HeadToHeadCommand(BaseCommand):
 
     command_term = 'head-to-head'
     url_path = 'api/match/head_to_head/'
-    shame_adjectives = (
-        'awkward',
-        'distressing',
-        'embarrassing',
-        'shameful',
-        'troubling',
-    )
     help = (
         'Use the `head-to-head` command to see all results between two players.\n'
         'For example, `@poolbot head-to-head @danny @marin` will return number '
@@ -38,6 +31,7 @@ class HeadToHeadCommand(BaseCommand):
                 'player2': player2,
             }
         )
+
         if response.status_code == 200:
             data = response.json()
             player1_wins = data[player1]
@@ -46,18 +40,27 @@ class HeadToHeadCommand(BaseCommand):
             most_loses = player2 if most_wins == player1 else player1
 
             reply_text = (
-                '{winner} has beaten {loser} {win_count} times - giving a win '
-                'ratio of {ratio}! How {adjective} for {biggest_loser}!'
+                '{winner} has won {winner_win_count} games. '
+                '{loser} has only won {loser_win_count}! '
+                'This gives a win ratio of {winner_ratio} for {winner}! '
             )
+
+            try:
+                winning_percentage = ((data[most_wins] * 100) / sum(data.values()))
+            except ZeroDivisionError:
+                return (
+                    '{player1} and {player2} are yet to record any games!'.format(
+                        player1=self.poolbot.get_username(player1),
+                        player2=self.poolbot.get_username(player2)
+                    )
+                )
+
             return reply_text.format(
-                winner=most_wins,
-                loser=most_loses,
-                win_count=data[most_wins],
-                ratio='{percentage:.0%}'.format(
-                    percentage=float(data[most_wins]/(sum(data.values())))
-                ),
-                adjective=random.choice(self.shame_adjectives),
-                biggest_loser=most_loses
+                winner=self.poolbot.get_username(most_wins),
+                loser=self.poolbot.get_username(most_loses),
+                winner_win_count=data[most_wins],
+                loser_win_count=data[most_loses],
+                winner_ratio='{percent:.0f}%'.format(percent=winning_percentage)
             )
         else:
-            return 'Unable to get head to head data'
+            return 'Sorry, I was unable to get head to head data!'
