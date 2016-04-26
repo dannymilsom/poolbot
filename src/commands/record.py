@@ -10,18 +10,27 @@ class RecordCommand(BaseCommand):
     url_path = 'api/match/'
     victory_nouns = (
         'beat',
+        'battered',
         'defeated',
+        'destroyed',
+        'crushed',
         'clobbered',
         'crushed',
         'defeated',
         'disgraced',
-        'embarrased',
+        'emasculated',
+        'grilled',
+        'embarrassed',
+        'humiliated',
         'grannied',
         'hammered',
         'obliterated',
         'pounded',
         'trounced',
         'thrashed',
+        'slayed',
+        'smashed',
+        'spangled',
         'walloped',
     )
 
