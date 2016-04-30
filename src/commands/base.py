@@ -40,3 +40,8 @@ class BaseCommand(object):
     def _strip_poolbot_from_message(self, message):
         """Return the message text with the poolbot mention removed."""
         return message['text'].lstrip(self.poolbot.bot_mention).strip()
+
+    def _command_args(self, message):
+        """Return an iterable of all args passed after the poolbot mention."""
+        stripped_message = self._strip_poolbot_from_message(message)
+        return stripped_message.split()
