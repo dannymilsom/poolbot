@@ -1,5 +1,3 @@
-import requests
-
 from .base import BaseCommand
 
 
@@ -52,15 +50,14 @@ class RecordCommand(BaseCommand):
                 )
             )
 
-        response = requests.post(
+        response = self.poolbot.session.post(
             self._generate_url(),
             data={
                 'winner': message['user'],
                 'loser': defeated_player,
                 'channel': message['channel'],
                 'granny': 'grannied' in lower_text,
-            },
-            headers=self.poolbot.get_request_headers()
+            }
         )
 
         if response.status_code == 201:

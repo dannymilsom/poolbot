@@ -1,4 +1,3 @@
-import requests
 import random
 
 from .base import BaseCommand
@@ -23,9 +22,8 @@ class HeadToHeadCommand(BaseCommand):
         except IndexError:
             return 'Sorry, I was unable to find two users in that message...' 
 
-        response = requests.get(
+        response = self.poolbot.session.get(
             self._generate_url(),
-            headers=self.poolbot.get_request_headers(),
             params={
                 'player1': player1,
                 'player2': player2,

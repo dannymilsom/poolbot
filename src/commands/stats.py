@@ -1,5 +1,3 @@
-import requests
-
 from .base import BaseCommand
 
 
@@ -15,10 +13,7 @@ class StatsCommand(BaseCommand):
         except IndexError:
             return 'Sorry, I was unable to find a user in that message...' 
 
-        response = requests.get(
-            self._generate_url(user_id=user_id),
-            headers=self.poolbot.get_request_headers()
-        )
+        response = self.poolbot.session.get(self._generate_url(user_id=user_id))
 
         if response.status_code == 200:
             return self._generate_response(response.json())

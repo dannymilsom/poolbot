@@ -1,5 +1,3 @@
-import requests
-
 from .base import BaseCommand
 
 
@@ -18,10 +16,9 @@ class LeaderboardCommand(BaseCommand):
         leaderboard_url = self._generate_url()
 
         get_params = {'ordering': '-total_wins_field'}
-        response = requests.get(
+        response = self.poolbot.session.get(
             leaderboard_url,
             params=get_params,
-            headers=self.poolbot.get_request_headers()
         )
 
         if response.status_code == 200:

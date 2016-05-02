@@ -1,5 +1,3 @@
-import requests
-
 from base import BaseReaction
 
 
@@ -16,13 +14,12 @@ class ChannelJoinReaction(BaseReaction):
 
         # add the user to the users list if not already
         if user_id not in self.poolbot.users:
-            response = requests.post(
+            response = self.poolbot.session.post(
                 self._generate_url(),
                 data={
                     'name': user_details['user']['name'],
                     'slack_id': user_details['user']['id']
-                },
-                headers=self.poolbot.get_request_headers()
+                }
             )
 
         return 'Welcome to the baze {name}!'.format(

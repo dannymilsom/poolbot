@@ -28,6 +28,9 @@ class PoolBot(object):
         # connect to the slack websocket
         self.client = SlackClient(self.api_token)
 
+        # initalize a session with default authorization headers
+        self.prepare_requests_session()
+
         # save all the channels poolbot is in, and all users into memory
         self.store_poolbot_channels()
         self.store_users()
@@ -130,10 +133,7 @@ class PoolBot(object):
         storage, and cache the user objects in memory for later reference."""
         # get all users currently stored in the datastore
         player_api_url = self.generate_url('api/player/')
-        response = requests.get(
-            player_api_url,
-            headers=self.get_request_headers()
-        )
+        response = self.session.get(player_api_url)
         stored_ids = [user['slack_id'] for user in response.json()]
 
         self.users = {}
@@ -141,33 +141,31 @@ class PoolBot(object):
         if all_users['ok']:
             for user in all_users['members']:
                 # annoying slackbot does not have is_bot set as True
-                if user['name'] == 'slackbot' or user['is_bot']:
+                if user['name'] == 'slackbot' or user.get('is_bot', False):
                     continue
 
                 # cache all users in memory too
                 self.users[user['id']] = user
 
                 if user['id'] not in stored_ids:
-                    requests.post(
+                    self.session.post(
                         player_api_url,
                         data={
                             'name': user['name'],
                             'slack_id': user['id']
-                        },
-                        headers=self.get_request_headers()
+                        }
                     )
 
     def store_user(self, user_id):
         """Store a single user in the server side datastore."""
         user_details = self.client.api_call('users.info', user=user_id)
         url = self.generate_url('api/player')
-        response = requests.post(
+        response = self.session.post(
             url,
             data={
                 'name': user_details['user']['name'],
                 'slack_id': user_details['user']['id']
-            },
-            headers=self.get_request_headers()
+            }
         )
 
     def get_username(self, user_id, capitalize=True):
@@ -180,11 +178,11 @@ class PoolBot(object):
         """Join the host portion of the URL with the provided path."""
         return urljoin(self.server_host, path)
 
-    def get_request_headers(self):
-        """Return a dictionary of HTTP headers to be included with a request."""
-        return {
-            'Authorization': 'Token {token}'.format(token=self.server_token)
-        }
+    def prepare_requests_session(self):
+        self.session = requests.Session()
+        self.session.headers.update(
+            {'Authorization': 'Token {token}'.format(token=self.server_token)}
+        )
 
 
 if __name__ == '__main__':

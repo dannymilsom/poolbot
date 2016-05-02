@@ -1,5 +1,3 @@
-import requests
-
 from .base import BaseCommand
 
 
@@ -21,10 +19,7 @@ class FormCommand(BaseCommand):
             return 'Sorry, I was unable to find a user in that message...' 
 
         player_form_url = self._generate_url(user_id=user_id)
-        response = requests.get(
-            player_form_url,
-            headers=self.poolbot.get_request_headers()
-        )
+        response = self.poolbot.session.get(player_form_url)
 
         if response.status_code == 200:
             return 'Recent results for {user_name}: `{results}`'.format(
