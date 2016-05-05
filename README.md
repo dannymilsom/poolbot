@@ -28,12 +28,18 @@ You can read about all of the available reactions here.
 
 ## Contributioning
 
-All patches to fix bugs and add features are welcome!
+To get the development environment up and running follow these steps...
 
-To get the development environment up and running follow these steps... TODO
-
-* Create a `config.yaml` in the `src` directory and add all the values listed in `example_config.yaml`. This includes the `SLACK_API_TOKEN`!
-TODO
+1. To persist data and provide a RESTful(ish) API, clone the [poolbot-server](https://github.com/dannymilsom/poolbot-server) repository.
+   This is a django app, so install all the python module dependencies using `virtualenv` and boot the development server via `manage.py runserver`.
+2. Add a custom bot integration to your slack team. This process, and more information about bot users in slack, is well described in the [official slack docs](https://api.slack.com/bot-users).
+3. Create a `config.yaml` in the `src` directory and add all the values listed in `example_config.yaml`. This includes:
+ * `API_TOKEN` which you can find on your slack bots settings page.
+ * `BOT_ID` which is the unique ID assigned to your custom bot.
+ * `SERVER_HOST` which is probably `http://127.0.0.1:8000/` if you're running the django development server included with [poolbot-server](https://github.com/dannymilsom/poolbot-server).
+ * `SERVER_TOKEN` which you need to send in the `Authorization` header of every request to the [poolbot-server](https://github.com/dannymilsom/poolbot-server). These are generated in
+   a post save signal for every user, so you just need to look at the `Token` model via django admin and copy the token key.
+3. Finally run `python poolbot.py` and all messages sent by the slack RTM API in rooms which your custom bot are in, will be consumed by poolbot.
 
 ## Wish List
 
