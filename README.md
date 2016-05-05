@@ -26,7 +26,7 @@ For example when a new user joins a channel with poolbot in, poolbot will welcom
 
 You can read about all of the available reactions here.
 
-## Contributioning
+## Contributing
 
 To get the development environment up and running follow these steps...
 
