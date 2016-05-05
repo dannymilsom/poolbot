@@ -15,7 +15,7 @@ class LeaderboardCommand(BaseCommand):
         """Get the recent match results for the user mentioned in the text."""
         leaderboard_url = self._generate_url()
 
-        get_params = {'ordering': '-total_wins_field'}
+        get_params = {'ordering': '-total_win_count'}
         response = self.poolbot.session.get(
             leaderboard_url,
             params=get_params,
