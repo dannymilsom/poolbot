@@ -5,13 +5,3 @@ from leaderboard import LeaderboardCommand
 from odds import OddsCommand
 from record import RecordCommand
 from stats import StatsCommand
-
-command_handlers = [
-    FormCommand,
-    HeadToHeadCommand,
-    HelpCommand,
-    LeaderboardCommand,
-    RecordCommand,
-    StatsCommand,
-    OddsCommand,
-]

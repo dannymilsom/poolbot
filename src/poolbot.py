@@ -1,5 +1,7 @@
 """Pool focused slack bot which interacts via a RTM websocket."""
 
+import inspect
+import importlib
 import requests
 from time import sleep
 from urlparse import urljoin
@@ -7,8 +9,6 @@ import yaml
 
 from slackclient import SlackClient
 
-from commands import command_handlers
-from reactions import reaction_handlers
 from utils import MissingConfigurationException
 
 
@@ -16,6 +16,7 @@ class PoolBot(object):
     """Records pool results and much more using a custom slack bot."""
 
     CONFIG_FILENAME = 'config.yaml'
+    PLUGIN_DIRS = ('commands', 'reactions')
     REQUIRED_SETTINGS = ('api_token', 'bot_id', 'server_host', 'server_token')
 
     def __init__(self):
@@ -63,8 +64,14 @@ class PoolBot(object):
 
     def load_handlers(self):
         """Load and invoke all command and reaction handlers."""
-        self.commands = [command(self) for command in command_handlers]
-        self.reactions = [reaction(self) for reaction in reaction_handlers]
+        self.commands = []
+        self.reactions = []
+
+        for plugin_dir in self.PLUGIN_DIRS:
+            plugin_module = importlib.import_module(plugin_dir)
+            for name, obj in inspect.getmembers(plugin_module):
+                if inspect.isclass(obj):
+                    getattr(self, plugin_dir).append(obj(self))
 
     def listen(self):
         """Establish a connection with the Slack RTM websocket and read all
