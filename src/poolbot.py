@@ -23,9 +23,6 @@ class PoolBot(object):
         # load config settings from yaml file
         self.load_config()
 
-        # load all command and reaction handlers
-        self.load_handlers()
-
         # connect to the slack websocket
         self.client = SlackClient(self.api_token)
 
@@ -35,6 +32,9 @@ class PoolBot(object):
         # save all the channels poolbot is in, and all users into memory
         self.store_poolbot_channels()
         self.store_users()
+
+        # load all command and reaction handlers, and do pre processing work
+        self.load_handlers()
 
         # because we will compare it regularly, cache the bot mention string
         self.bot_mention = '<@{bot_id}>:'.format(bot_id=self.bot_id)
@@ -73,6 +73,10 @@ class PoolBot(object):
                 if inspect.isclass(obj):
                     getattr(self, plugin_dir).append(obj(self))
 
+        # some commands ralso equire some setup work before they can be used
+        for command in self.commands:
+            command.setup()
+
     def listen(self):
         """Establish a connection with the Slack RTM websocket and read all
         omitted messages."""
@@ -104,7 +108,7 @@ class PoolBot(object):
                     handler = reaction
                     break
 
-        reply = handler.process_request(message) if handler else None
+        reply = handler.process_request(message, channel) if handler else None
 
         if reply is not None:
             channel = self.get_channel(message['channel'])
@@ -115,6 +119,8 @@ class PoolBot(object):
         # check poolbot was explicitly mentioned
         if not message.get('text', '').startswith(self.bot_mention):
             return False
+
+        return True
 
         # verify poolbot is in the channel where the message was posted
         return message.get('channel') in self.poolbot_channels

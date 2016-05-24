@@ -61,6 +61,29 @@ class RecordCommand(BaseCommand):
         )
 
         if response.status_code == 201:
+
+            # also check if we need to update a active challenge
+            response = self.poolbot.session.post(
+                self._generate_url(),
+                data={
+                    'active': True,
+                    'initiator': message['user'],
+                    'initiator': defeated_player,
+                    'challenger': message['user'],
+                    'challenger': defeated_player,
+                }
+            )
+            if response.status_code == 200:
+                # get the data and manually compare in python to find a match for the two users
+                data = response.json()
+                if len(data):
+                    challenge_pk = data[0].pk
+                    response = self.poolbot.session.post(
+                        self._generate_url(),
+                        data={'active': False}
+                    )
+
+
             return 'Victory recorded for {winner}!'.format(
                 winner=self.poolbot.get_username(message['user'])
             )

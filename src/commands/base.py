@@ -25,6 +25,11 @@ class BaseCommand(object):
         for poolbot to post back to the channel."""
         return NotImplemented()
 
+    def setup(self):
+        """Perform some actions when the poolbot client loads, in preperation
+        for message processing."""
+        pass
+
     def _find_user_mentions(self, message):
         """Parses the message text and returns all user ids mentioned excluding
         poolbot."""
