@@ -16,11 +16,14 @@ class HeadToHeadCommand(BaseCommand):
 
     def process_request(self, message):
         mentioned_user_ids = self._find_user_mentions(message)
+        if not len(mentioned_user_ids):
+            return 'Sorry, I was unable to find two users in that message...'
+
         try:
             player1 = mentioned_user_ids[0]
             player2 = mentioned_user_ids[1]
         except IndexError:
-            return 'Sorry, I was unable to find two users in that message...' 
+            player2 = message['user']
 
         response = self.poolbot.session.get(
             self._generate_url(),

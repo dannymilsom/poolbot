@@ -11,7 +11,7 @@ class StatsCommand(BaseCommand):
         try:
             user_id = self._find_user_mentions(message)[0]
         except IndexError:
-            return 'Sorry, I was unable to find a user in that message...' 
+            user_id = message['user']
 
         response = self.poolbot.session.get(self._generate_url(user_id=user_id))
 
