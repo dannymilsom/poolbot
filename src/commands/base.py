@@ -14,7 +14,7 @@ class BaseCommand(object):
 
     def match_request(self, text):
         """Return a boolean to indicate if the message is a command directed
-        at poolbot. The `@poolbot` mention should already be stripped from the
+        at poolbot. The `@poolbot:` mention should already be stripped from the
         beginning of the text passed as an argument, to avoid the overhead of
         checking in each commands match_request() method."""
         first_word = text.strip().split(' ')[0]

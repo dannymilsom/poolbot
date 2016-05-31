@@ -37,7 +37,7 @@ class PoolBot(object):
         self.load_handlers()
 
         # because we will compare it regularly, cache the bot mention string
-        self.bot_mention = '<@{bot_id}>:'.format(bot_id=self.bot_id)
+        self.bot_mention = '<@{bot_id}>'.format(bot_id=self.bot_id)
 
     def load_config(self):
         """Load the configuration settings from a YAML file."""
@@ -94,10 +94,11 @@ class PoolBot(object):
 
         # if the message is a explicit command for poolbot, action it
         if self.command_for_poolbot(message):
-            stripped_text = message['text'].lstrip(self.bot_mention).strip()
+            stripped_text = message['text'].lstrip(self.bot_mention).strip(': ')
             for command in self.commands:
                 if command.match_request(stripped_text):
                     handler = command
+                    message['text'] = stripped_text
                     break
 
         # if not an explicit command, see if any of the reaction handlers

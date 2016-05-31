@@ -9,6 +9,7 @@ class FormCommand(BaseCommand):
     help = (
         'Use the `form` command to get the recent results for a given user.\n'
         'For example, `@poolbot form @danny` will return a string like `W W L`.'
+        'If no user is passed, grab the message authors stats.'
     )
 
     def process_request(self, message):
@@ -16,7 +17,7 @@ class FormCommand(BaseCommand):
         try:
             user_id = self._find_user_mentions(message)[0]
         except IndexError:
-            return 'Sorry, I was unable to find a user in that message...' 
+            user_id = message['user']
 
         player_form_url = self._generate_url(user_id=user_id)
         response = self.poolbot.session.get(player_form_url)

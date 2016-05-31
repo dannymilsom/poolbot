@@ -11,14 +11,14 @@ class StatsCommand(BaseCommand):
         try:
             user_id = self._find_user_mentions(message)[0]
         except IndexError:
-            return 'Sorry, I was unable to find a user in that message...' 
+            user_id = message['user']
 
         response = self.poolbot.session.get(self._generate_url(user_id=user_id))
 
         if response.status_code == 200:
             return self._generate_response(response.json())
         else:
-            return 'Sorry, I was unable to record that result.'
+            return 'Sorry, I was unable to fetch that data.'
 
     def _generate_response(self, data):
         """Parse the returned data and transform it into a human readable
