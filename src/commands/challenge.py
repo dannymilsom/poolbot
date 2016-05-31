@@ -16,7 +16,7 @@ class ChallengeCommand(BaseCommand):
         response = self.poolbot.session.get(self._generate_url())
         if response.status_code == 200:
             challenge_channels = set(
-                [challenge['channel'] for challenge in challenges]
+                [challenge['channel'] for challenge in response.json()]
             )
 
         all_poolbot_channels = set(self.poolbot.poolbot_channels)
@@ -26,8 +26,7 @@ class ChallengeCommand(BaseCommand):
             response = self.poolbot.session.post(
                 self._generate_url(),
                 data={
-                    'channel': message['channel'],
-                    'initiator': message['user']
+                    'channel': channel_id,
                 }
             )
 
@@ -38,9 +37,9 @@ class ChallengeCommand(BaseCommand):
         """
         author = message['user']
         command_args = self._command_args(message)
-        channel_challenge = self._get_chanel_challenge(message['channel'])
+        channel_challenge = self._get_channel_challenge(message['channel'])
 
-        # create a new challenge instance
+        # create a invoke a new challenge
         if len(command_args) == 1:
 
             # try and set the initiator to the message author
@@ -66,28 +65,11 @@ class ChallengeCommand(BaseCommand):
                         initiator=self.poolbot.get_username(author)
                     )
                 )
-            else:
-                # all the other possible outcomes / validation warnings
-                pass
-                # last_challenge = data[0]
-                # if last_challenge['active']:
-                #     if last_challenge['challenger'] is None:
-                #         return (
-                #             "{initiator} recently created a challenge. You "
-                #             "should accept that first before creating a new "
-                #             "one".format(
-                #                 initiator=self.poolbot.get_username(last_challenge['initiator'])
-                #             )
-                #         )
-                #     else:
-                #         return (
-                #             "We're waiting for {initiator} and {challenger} to "
-                #             "record their result before a new challenge can be "
-                #             "created.".format(
-                #                 initiator=self.poolbot.get_username(last_challenge['initiator']),
-                #                 challenger=self.poolbot.get_username(last_challenge['challenger'])
-                #             )
-                #         )
+            elif response.status_code == 400:
+                try:
+                    return response.json()['non_field_errors'][0]
+                except KeyError:
+                    return response.reason
 
         # otherwise find the channel challenge instance and update the players
         elif command_args[1] == 'accept':
@@ -96,7 +78,7 @@ class ChallengeCommand(BaseCommand):
             response = self.poolbot.session.patch(
                 "{base_url}{detail_pk}/".format(
                     base_url=self._generate_url(),
-                    detail_pk=str(challenge_pk)
+                    detail_pk=str(channel_challenge['id'])
                 ),
                 data={
                     'challenger': author
@@ -104,6 +86,7 @@ class ChallengeCommand(BaseCommand):
             )
 
             if response.status_code == 200:
+                data = response.json()
                 return (
                     'To the baize! {initiator} vs {challenger}'.format(
                         initiator=self.poolbot.get_username(data[0]['initiator']),
@@ -111,12 +94,14 @@ class ChallengeCommand(BaseCommand):
                     )
                 )
             else:
-                # handle all other validation which might come back
-
+                try:
+                    return response.json()['non_field_errors'][0]
+                except KeyError:
+                    return response.reason
         else:
             return 'Sorry, something went wrong.'
 
-    def _get_channel_challenge(channel):
+    def _get_channel_challenge(self, channel):
         """Retrives the channel speicifc challenge instance."""
         response = self.poolbot.session.get(
             self._generate_url(),
@@ -125,4 +110,4 @@ class ChallengeCommand(BaseCommand):
             }
         )
         if response.status_code == 200:
-            return response.json()
+            return response.json()[0]

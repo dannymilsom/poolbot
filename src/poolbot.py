@@ -109,7 +109,7 @@ class PoolBot(object):
                     handler = reaction
                     break
 
-        reply = handler.process_request(message, channel) if handler else None
+        reply = handler.process_request(message) if handler else None
 
         if reply is not None:
             channel = self.get_channel(message['channel'])

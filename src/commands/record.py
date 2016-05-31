@@ -62,27 +62,36 @@ class RecordCommand(BaseCommand):
 
         if response.status_code == 201:
 
-            # also check if we need to update a active challenge
-            response = self.poolbot.session.post(
-                self._generate_url(),
-                data={
-                    'active': True,
-                    'initiator': message['user'],
-                    'initiator': defeated_player,
-                    'challenger': message['user'],
-                    'challenger': defeated_player,
+            # also check if we need to update an active challenge, so 
+            # fetch the challenge instance for the room
+            response = self.poolbot.session.get(
+                self.poolbot.generate_url('api/challenge'),
+                params={
+                    'channel': message['channel'],
                 }
             )
             if response.status_code == 200:
-                # get the data and manually compare in python to find a match for the two users
+                # see if the two players match
                 data = response.json()
                 if len(data):
-                    challenge_pk = data[0].pk
-                    response = self.poolbot.session.post(
-                        self._generate_url(),
-                        data={'active': False}
+                    challenge_players = (
+                        data[0]['initiator'],
+                        data[0]['challenger']
                     )
-
+                    if message['user'] in challenge_players and defeated_player in challenge_players:
+                        # bingo - update the players now the result is recorded
+                        challenge_pk = data[0]['id']
+                        response = self.poolbot.session.patch(
+                            self.poolbot.generate_url(
+                                'api/challenge/{challenge_pk}/'.format(
+                                    challenge_pk=challenge_pk
+                                )
+                            ),
+                            data={
+                                'initiator': '',
+                                'challenger': ''
+                            }
+                        )
 
             return 'Victory recorded for {winner}!'.format(
                 winner=self.poolbot.get_username(message['user'])
