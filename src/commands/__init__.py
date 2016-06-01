@@ -4,5 +4,6 @@ from head_to_head import HeadToHeadCommand
 from help import HelpCommand
 from leaderboard import LeaderboardCommand
 from odds import OddsCommand
+from profile import ProfileCommand
 from record import RecordCommand
 from stats import StatsCommand
