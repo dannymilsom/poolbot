@@ -44,20 +44,11 @@ class ChallengeCommand(BaseCommand):
 
             # try and set the initiator to the message author
             response = self.poolbot.session.patch(
-                "{base_url}{detail_pk}/".format(
-                    base_url=self._generate_url(),
-                    detail_pk=str(channel_challenge['id'])
-                ),
+                self._get_detail_url(channel_challenge['id']),
                 data={
                     'initiator': author
                 }
             )
-
-            # the server will perform some validation to check that
-            # this action is permitted, which is true when:
-            #   * both initiator and challenger fields are null
-            #   * if the initiator and challenger are not null,
-            #     but the last modified time is >10mins ago
 
             if response.status_code == 200:
                 return (
@@ -65,21 +56,15 @@ class ChallengeCommand(BaseCommand):
                         initiator=self.poolbot.get_username(author)
                     )
                 )
-            elif response.status_code == 400:
-                try:
-                    return response.json()['non_field_errors'][0]
-                except KeyError:
-                    return response.reason
+            else:
+                return self._get_validation_error(response)
 
         # otherwise find the channel challenge instance and update the players
         elif command_args[1] == 'accept':
 
             # update the related players in the challenge object
             response = self.poolbot.session.patch(
-                "{base_url}{detail_pk}/".format(
-                    base_url=self._generate_url(),
-                    detail_pk=str(channel_challenge['id'])
-                ),
+                self._get_detail_url(channel_challenge['id']),
                 data={
                     'challenger': author
                 }
@@ -89,15 +74,12 @@ class ChallengeCommand(BaseCommand):
                 data = response.json()
                 return (
                     'To the baize! {initiator} vs {challenger}'.format(
-                        initiator=self.poolbot.get_username(data[0]['initiator']),
+                        initiator=self.poolbot.get_username(data['initiator']),
                         challenger=self.poolbot.get_username(author)
                     )
                 )
             else:
-                try:
-                    return response.json()['non_field_errors'][0]
-                except KeyError:
-                    return response.reason
+                return self._get_validation_error(response)
         else:
             return 'Sorry, something went wrong.'
 
@@ -111,3 +93,18 @@ class ChallengeCommand(BaseCommand):
         )
         if response.status_code == 200:
             return response.json()[0]
+
+    def _get_detail_url(self, channel_pk):
+        """Generate the detail URL of a challenge instance."""
+        return "{base_url}{detail_pk}/".format(
+            base_url=self._generate_url(),
+            detail_pk=str(channel_pk)
+        )
+
+    def _get_validation_error(self, response):
+        """Returns the validation errors from a request object, falling back
+        to the resposne reason if no explicit errors are found."""
+        try:
+            return response.json()['non_field_errors'][0]
+        except KeyError:
+            return response.reason
