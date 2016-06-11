@@ -11,6 +11,7 @@ class FormCommand(BaseCommand):
         'For example, `@poolbot form @danny` will return a string like `W W L`.'
         'If no user is passed, grab the message authors stats.'
     )
+    DEFAULT_LIMIT = 10
 
     def process_request(self, message):
         """Get the recent match results for the user mentioned in the text."""
@@ -19,8 +20,20 @@ class FormCommand(BaseCommand):
         except IndexError:
             user_id = message['user']
 
+        # we pass an additional GET limit param to reduce the number of results
+        args = self._command_args(message)
+        limit = self.DEFAULT_LIMIT
+        if len(args) > 1:
+            try:
+                limit = int(args[1])
+            except ValueError:
+                pass
+
         player_form_url = self._generate_url(user_id=user_id)
-        response = self.poolbot.session.get(player_form_url)
+        response = self.poolbot.session.get(
+            player_form_url,
+            params={'limit': limit}
+        )
 
         if response.status_code == 200:
             return 'Recent results for {user_name}: `{results}`'.format(
