@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from utils import format_datetime_to_date
 from .base import BaseCommand
 
 
@@ -43,9 +44,7 @@ class ProfileCommand(BaseCommand):
         del profile_data['slack_id']
 
         # and we want a human friendly version of the joined timestamp
-        joined = profile_data['joined']
-        datetime_obj = datetime.strptime(joined, "%Y-%m-%dT%H:%M:%S.%fZ")
-        profile_data['joined'] = datetime_obj.date()
+        profile_data['joined'] = format_datetime_to_date(profile_data['joined'])
 
         msg = " \n".join(
             '{attribute}: {value}'.format(

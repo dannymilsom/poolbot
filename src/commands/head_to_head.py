@@ -1,5 +1,8 @@
+from datetime import datetime
 import random
+from operator import itemgetter
 
+from utils import format_datetime_to_date
 from .base import BaseCommand
 
 
@@ -37,6 +40,7 @@ class HeadToHeadCommand(BaseCommand):
             data = response.json()
             player1_wins = data[player1]
             player2_wins = data[player2]
+            total_games = player1_wins + player2_wins
             most_wins = player1 if player1_wins > player2_wins else player2
             most_loses = player2 if most_wins == player1 else player1
 
@@ -44,10 +48,12 @@ class HeadToHeadCommand(BaseCommand):
                 '{winner} has won {winner_win_count} games. '
                 '{loser} has only won {loser_win_count}! '
                 'This gives a win ratio of {winner_ratio} for {winner}! '
+                'The last {recent_game_count} results were:'
+                '```\n{recent_games}\n```'
             )
 
             try:
-                winning_percentage = ((data[most_wins] * 100) / sum(data.values()))
+                winning_percentage = ((data[most_wins] * 100) / total_games)
             except ZeroDivisionError:
                 return (
                     '{player1} and {player2} are yet to record any games!'.format(
@@ -61,7 +67,22 @@ class HeadToHeadCommand(BaseCommand):
                 loser=self.poolbot.get_username(most_loses),
                 winner_win_count=data[most_wins],
                 loser_win_count=data[most_loses],
-                winner_ratio='{percent:.0f}%'.format(percent=winning_percentage)
+                winner_ratio='{percent:.0f}%'.format(percent=winning_percentage),
+                recent_game_count=data['history_count'],
+                recent_games=self._format_recent_matches(data['history'])
             )
         else:
             return 'Sorry, I was unable to get head to head data!'
+
+    def _format_recent_matches(self, matches):
+        ordered_matches = sorted(matches, key=itemgetter('date'), reverse=True)
+        match_template = '{data}: {winner} beat {loser}'
+        formatted_matches = [
+            match_template.format(
+                data=format_datetime_to_date(match['date']),
+                winner=self.poolbot.get_username(match['winner']),
+                loser=self.poolbot.get_username(match['loser'])
+            ) for match in ordered_matches
+        ]
+        return "\n".join(formatted_matches)
+
