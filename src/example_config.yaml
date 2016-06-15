@@ -5,3 +5,15 @@ bot_id: <BOT SLACK ID>
 server_host: <SERVER HOST ADDRESS>
 
 server_token: <SERVER HOST REST FRAMEWORK TOKEN>
+
+
+# PLUGIN / COMMANDS
+
+record_emojis:
+  - beers
+  - partyparrot
+  - sunglasses
+  - ambulance
+  - champagne
+  - muscle
+  - boom

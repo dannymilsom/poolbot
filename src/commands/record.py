@@ -1,3 +1,5 @@
+import random
+
 from .base import BaseCommand
 
 
@@ -93,10 +95,16 @@ class RecordCommand(BaseCommand):
                             }
                         )
 
-            return 'Victory recorded for {winner}!'.format(
-                winner=self.poolbot.get_username(message['user'])
+            return 'Victory recorded for {winner}! :{emoji}:'.format(
+                winner=self.poolbot.get_username(message['user']),
+                emoji=self.get_emojis()
             )
         else:
             return 'Sorry, I was unable to record that result.'
         # TODO generate some funny phrase to celebrate the victory
         # eg highlight an unbetean run, or X consequtive lose etc
+
+    def get_emojis(self):
+        """Returns an iterable of emojis to append to the victory reply."""
+        emojis = self.poolbot.config['record_emojis']
+        return random.choice(emojis)
