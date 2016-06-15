@@ -105,6 +105,6 @@ class RecordCommand(BaseCommand):
         # eg highlight an unbetean run, or X consequtive lose etc
 
     def get_emojis(self):
-        """Returns an iterable of emojis to append to the victory reply."""
+        """Returns a random emojis to append to the victory reply."""
         emojis = self.poolbot.config['record_emojis']
         return random.choice(emojis)
