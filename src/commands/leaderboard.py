@@ -36,9 +36,9 @@ class LeaderboardCommand(BaseCommand):
         """
         limit = self.default_limit
         args = self._command_args(message)
-        if len(args) > 1:
+        if args:
             try:
-                limit = int(args[1])
+                limit = int(args[0])
             except ValueError:
                 pass
         return limit

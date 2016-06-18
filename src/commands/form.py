@@ -25,9 +25,9 @@ class FormCommand(BaseCommand):
         # we pass an additional GET limit param to reduce the number of results
         args = self._command_args(message)
         limit = self.DEFAULT_LIMIT
-        if len(args) > 1:
+        if args:
             try:
-                limit = int(args[1])
+                limit = int(args[0])
             except ValueError:
                 pass
 

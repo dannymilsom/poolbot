@@ -46,7 +46,14 @@ class BaseCommand(object):
         """Return the message text with the poolbot mention removed."""
         return message['text'].lstrip(self.poolbot.bot_mention).strip()
 
-    def _command_args(self, message):
+    def _command_args(self, message, include_command_term=False):
         """Return an iterable of all args passed after the poolbot mention."""
         stripped_message = self._strip_poolbot_from_message(message)
-        return stripped_message.split()
+        split_message = stripped_message.split()
+
+        # we know the first argument is going to be the command_term,
+        # as we check this in the match_request() method
+        if not include_command_term:
+            del split_message[0]
+
+        return split_message

@@ -46,7 +46,7 @@ class ChallengeCommand(BaseCommand):
         channel_challenge = self._get_channel_challenge(message['channel'])
 
         # create a invoke a new challenge
-        if len(command_args) == 1:
+        if not command_args:
 
             # try and set the initiator to the message author
             response = self.poolbot.session.patch(
@@ -66,7 +66,7 @@ class ChallengeCommand(BaseCommand):
                 return self._get_validation_error(response)
 
         # otherwise find the channel challenge instance and update the players
-        elif command_args[1] == 'accept':
+        elif command_args[0] == 'accept':
 
             # update the related players in the challenge object
             response = self.poolbot.session.patch(

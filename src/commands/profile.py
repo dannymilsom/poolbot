@@ -20,7 +20,7 @@ class ProfileCommand(BaseCommand):
         user_id = message['user']
         url = self._generate_url(user_id=user_id)
 
-        if len(args) == 1 and args[0] == self.command_term:
+        if not args:
             # fetch the profile data of the message author
             response = self.poolbot.session.get(url)
 
@@ -28,12 +28,12 @@ class ProfileCommand(BaseCommand):
                 profile_attrs = response.json()
                 return self._get_profile_representation(profile_attrs)
 
-        if args[1] == 'set':
+        if args[0] == 'set':
             # trying to update some property on the user profile
             response = self.poolbot.session.patch(
                 url,
                 data={
-                    args[2]: args[3]
+                    args[1]: args[2]
                 }
             )
             if response.status_code == 200:
