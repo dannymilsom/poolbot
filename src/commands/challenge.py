@@ -8,6 +8,12 @@ class ChallengeCommand(BaseCommand):
 
     command_term = 'challenge'
     url_path = 'api/challenge/'
+    help_message = (
+        'Invoke a challenge to other players in the room with `@poolbot '
+        'challenge`. Accept an existing challenge with `@poolbot challenge '
+        'accept`.'
+    )
+
 
     def setup(self):
         """Each channel poolbot is in requires a unique challenge instance.

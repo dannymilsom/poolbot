@@ -12,27 +12,23 @@ class HelpCommand(BaseCommand):
     command_term = 'help'
 
     def process_request(self, message):
-        all_commands = [
-            FormCommand,
-            HeadToHeadCommand,
-            RecordCommand,
-            StatsCommand,
-            OddsCommand,
-        ]
+        """Return some helper messages describing how commands work."""
         helpers = {
-            command.command_term: command.help for command in all_commands
+            command.command_term: command.help_message for
+            command in self.poolbot.commands
         }
 
-        # looking for messages like @poolbot help <command_term>, falling back
-        # to a list of all command terms if no explicit help requsted
-        text_content = self._strip_poolbot_from_message(message)
-        split_text = text_content.lower().split(' ')
+        args = self._command_args(message)
         try:
-            reply = helpers[split_text[1]]
+            # asking for help on how to use an explicit command
+            reply = helpers[args[1]]
         except (IndexError, KeyError):
-            commands_list = ', '.join(helpers.keys())
-            reply = 'Try one of these commands: {command_list}'.format(
-                command_list=commands_list
+            # fallback to a general help message
+            commands = '`, `'.join(sorted(helpers.keys()))
+            template = (
+                'Try one of these commands: `{command_list}`. For more '
+                'help on how to use a command, type `@poolbot help <command>`.'
             )
+            reply = template.format(command_list=commands)
 
         return reply

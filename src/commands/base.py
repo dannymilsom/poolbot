@@ -3,7 +3,7 @@ import re
 
 class BaseCommand(object):
 
-    help = ''
+    help_message = 'No help available...'
     url_path = ''
     command_term = None
     mention_regex = '<@[a-zA-Z0-9]+>'

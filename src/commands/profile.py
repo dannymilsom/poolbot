@@ -9,6 +9,11 @@ class ProfileCommand(BaseCommand):
 
     command_term = 'profile'
     url_path = 'api/player/{user_id}'
+    help_message = (
+        'To view your own profile information, type `@poolbot profile`. To '
+        'set profile values, use the syntax `@poolbot profile set <fieldname> '
+        '<value>`.'
+    )
 
     def process_request(self, message):
         args = self._command_args(message)

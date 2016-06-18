@@ -6,10 +6,12 @@ class FormCommand(BaseCommand):
 
     command_term = 'form'
     url_path = 'api/player/{user_id}/form/'
-    help = (
-        'Use the `form` command to get the recent results for a given user.\n'
-        'For example, `@poolbot form @danny` will return a string like `W W L`.'
-        'If no user is passed, grab the message authors stats.'
+    help_message = (
+        'Use the `form` command to get the recent results for a given user. '
+        'For example, `@poolbot form @danny` will return a string like `W W L`. '
+        'If no user is passed, grab the message authors stats. By default only '
+        'the last ten games are displayed. To fetch more pass an extra argument '
+        'like `@poolbot form @danny 20`.'
     )
     DEFAULT_LIMIT = 10
 

@@ -7,8 +7,9 @@ class LeaderboardCommand(BaseCommand):
     default_limit = 10
     command_term = 'leaderboard'
     url_path = 'api/player/'
-    help = (
-        'Use the `leadboard` command to see which player has won the most overall games.'
+    help_message = (
+        'The leadboard command returns a table of users ranking by their raw '
+        'win count.'
     )
 
     def process_request(self, message):

@@ -11,10 +11,12 @@ class HeadToHeadCommand(BaseCommand):
 
     command_term = 'head-to-head'
     url_path = 'api/match/head_to_head/'
-    help = (
-        'Use the `head-to-head` command to see all results between two players.\n'
+    help_message = (
+        'Use the `head-to-head` command to see all results between two players. '
         'For example, `@poolbot head-to-head @danny @marin` will return number '
-        'of wins for each player.'
+        'of wins for each player, and the details of their last five matches. '
+        'If you want to see the head-to-head between yourself and another '
+        'player, passing your own name is optional.'
     )
 
     def process_request(self, message):

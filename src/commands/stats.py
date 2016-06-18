@@ -6,6 +6,11 @@ class StatsCommand(BaseCommand):
 
     command_term = 'stats'
     url_path = 'api/player/{user_id}/'
+    help_message = (
+        'The stats command returns interesting statistics about each player. '
+        'You can explicitly pass a player name, or just type `@poolbot stats` '
+        'to retrieve your own stats.'
+    )
 
     def process_request(self, message):
         try:

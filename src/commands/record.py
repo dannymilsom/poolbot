@@ -33,6 +33,10 @@ class RecordCommand(BaseCommand):
         'spangled',
         'walloped',
     )
+    help_message = (
+        'Record the outcome of a game between two players with the command '
+        '`@poolbot record beat <opponent>`.'
+    )
 
     def process_request(self, message):
         """The author is always the winner."""
