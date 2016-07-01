@@ -35,8 +35,8 @@ class StatsCommand(BaseCommand):
         game_count = win_count + loss_count
 
         return (
-            '{player} [{elo}] has played {game_count} games ({win_count} W'
-            '/ {loss_count} L)'.format(
+            '{player} has played {game_count} games '
+            '(E {elo} / W {win_count} / L {loss_count})'.format(
                 player=player_name.title(),
                 game_count=game_count,
                 win_count=win_count,
