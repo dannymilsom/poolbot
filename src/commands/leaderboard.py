@@ -16,7 +16,7 @@ class LeaderboardCommand(BaseCommand):
         """Get the recent match results for the user mentioned in the text."""
         leaderboard_url = self._generate_url()
 
-        get_params = {'ordering': '-total_win_count'}
+        get_params = {'ordering': '-elo'}
         response = self.poolbot.session.get(
             leaderboard_url,
             params=get_params,
@@ -47,12 +47,14 @@ class LeaderboardCommand(BaseCommand):
         """Parse the returned data and generate a string which takes the form
         of a leaderboard style table, with players ranked from 1 to X.
         """
-        leaderboard_row_msg = '{ranking}. {name} ({wins} wins)'
+        leaderboard_row_msg = '{ranking}. {name} [{elo}] ({wins} W / {losses} L)'
         leaderboard_table_rows = [
             leaderboard_row_msg.format(
                 ranking=i,
                 name=player['name'],
                 wins=player['total_win_count'],
+                wins=player['total_loss_count'],
+                elo=player['elo'],
             ) for i, player in enumerate(data, 1)
         ]
         return ' \n'.join(leaderboard_table_rows)
