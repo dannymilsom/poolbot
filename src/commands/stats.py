@@ -31,14 +31,16 @@ class StatsCommand(BaseCommand):
         player_name = data['name']
         win_count = data['total_win_count']
         loss_count = data['total_loss_count']
+        elo = data['elo']
         game_count = win_count + loss_count
 
         return (
-            '{player} has played {game_count} games ({win_count} W'
+            '{player} [{elo}] has played {game_count} games ({win_count} W'
             '/ {loss_count} L)'.format(
                 player=player_name.title(),
                 game_count=game_count,
                 win_count=win_count,
-                loss_count=loss_count
+                loss_count=loss_count,
+                elo=elo
             )
         )

@@ -87,4 +87,3 @@ class HeadToHeadCommand(BaseCommand):
             ) for match in ordered_matches
         ]
         return "\n".join(formatted_matches)
-
