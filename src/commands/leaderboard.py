@@ -24,7 +24,7 @@ class LeaderboardCommand(BaseCommand):
 
         if response.status_code == 200:
             limit = self._calculate_limit(message)
-            return self._generate_response(players_to_include, limit)
+            return self._generate_response(response.json(), limit)
         else:
             return 'Unable to get leadboard data'
 
