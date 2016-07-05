@@ -24,8 +24,7 @@ class LeaderboardCommand(BaseCommand):
 
         if response.status_code == 200:
             limit = self._calculate_limit(message)
-            players_to_include = response.json()[:limit]
-            return self._generate_response(players_to_include)
+            return self._generate_response(players_to_include, limit)
         else:
             return 'Unable to get leadboard data'
 
@@ -43,7 +42,7 @@ class LeaderboardCommand(BaseCommand):
                 pass
         return limit
 
-    def _generate_response(self, data):
+    def _generate_response(self, data, limit):
         """Parse the returned data and generate a string which takes the form
         of a leaderboard style table, with players ranked from 1 to X.
         """
@@ -59,4 +58,6 @@ class LeaderboardCommand(BaseCommand):
                     losses=player['total_loss_count'],
                     elo=player['elo'])
                 )
-        return ' \n'.join(leaderboard_table_rows)
+
+        # finally only return the rows we actually want
+        return ' \n'.join(leaderboard_table_rows[:limit])
