@@ -48,13 +48,15 @@ class LeaderboardCommand(BaseCommand):
         of a leaderboard style table, with players ranked from 1 to X.
         """
         leaderboard_row_msg = '{ranking}. {name} [Elo Score: {elo}] ({wins} W / {losses} L)'
-        leaderboard_table_rows = [
-            leaderboard_row_msg.format(
-                ranking=i,
-                name=player['name'],
-                wins=player['total_win_count'],
-                losses=player['total_loss_count'],
-                elo=player['elo'],
-            ) for i, player in enumerate(data, 1)
-        ]
+        leaderboard_table_rows = []
+
+        for player in data:  # Go through list
+            if player['total_win_count'] or player['total_loss_count']:  # See if user has played any games
+                leaderboard_table_rows.append(leaderboard_row_msg.format(
+                    ranking=len(leaderboard_table_rows) + 1,
+                    name=player['name'],
+                    wins=player['total_win_count'],
+                    losses=player['total_loss_count'],
+                    elo=player['elo'])
+                )
         return ' \n'.join(leaderboard_table_rows)
