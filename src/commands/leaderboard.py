@@ -44,18 +44,16 @@ class LeaderboardCommand(BaseCommand):
         return limit
 
     def _generate_response(self, data):
-         """Parse the returned data and generate a string which takes the form
+        """Parse the returned data and generate a string which takes the form
         of a leaderboard style table, with players ranked from 1 to X.
         """
         leaderboard_row_msg = '{ranking}. {name} [Elo Score: {elo}] ({wins} W / {losses} L)'
         leaderboard_table_rows = []
 
-        for i, player in enumerate(data, 1):  # Go through list
-            if player['total_win_count'] == 0 and player['total_loss_count'] == 0:  # See if user has played any games
-                pass
-            else:
+        for player in data:  # Go through list
+            if player['total_win_count'] or player['total_loss_count']:  # See if user has played any games
                 leaderboard_table_rows.append(leaderboard_row_msg.format(
-                    ranking=str(len(leaderboard_table_rows) + 1),
+                    ranking=len(leaderboard_table_rows) + 1,
                     name=player['name'],
                     wins=player['total_win_count'],
                     losses=player['total_loss_count'],
