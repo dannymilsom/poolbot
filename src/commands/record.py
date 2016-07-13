@@ -108,13 +108,13 @@ class RecordCommand(BaseCommand):
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = updated_elo_loser - original_elo_loser
 
-            return 'Victory recorded for {winner}[E {oew} ({ow}{dew})] against {loser}[E {oel} ({ol}{del})] ! :{emoji}:'.format(
+            return 'Victory recorded for {winner}[E {uew} ({ow}{dew})] against {loser}[E {uel} ({ol}{del})] ! :{emoji}:'.format(
                 winner=self.poolbot.get_username(message['user']),
                 emoji=self.get_emojis(),
                 loser=defeated_player,
-                oew=original_elo_winner,
+                uew=original_elo_winner,
                 dew=delta_elo_winner,
-                oel=original_elo_loser,
+                uel=original_elo_loser,
                 del=delta_elo_loser,
                 ow=("-" if delta_elo_winner < 0 else "+"),
                 ol=("-" if delta_elo_loser < 0 else "+")
