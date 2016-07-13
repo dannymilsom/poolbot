@@ -112,9 +112,9 @@ class RecordCommand(BaseCommand):
                 winner=self.poolbot.get_username(message['user']),
                 emoji=self.get_emojis(),
                 loser=defeated_player,
-                uew=original_elo_winner,
+                uew=updated_elo_winner,
                 dew=delta_elo_winner,
-                uel=original_elo_loser,
+                uel=updated_elo_loser,
                 del=delta_elo_loser,
                 ow=("-" if delta_elo_winner < 0 else "+"),
                 ol=("-" if delta_elo_loser < 0 else "+")
