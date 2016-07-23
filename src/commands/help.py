@@ -4,6 +4,7 @@ from .head_to_head import HeadToHeadCommand
 from .odds import OddsCommand
 from .record import RecordCommand
 from .stats import StatsCommand
+from .elo import EloCommand
 
 
 class HelpCommand(BaseCommand):
