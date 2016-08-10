@@ -56,6 +56,8 @@ class RecordCommand(BaseCommand):
                 )
             )
 
+        # cache the elo score of each player before recording the win
+        # TODO remove this additional API call
         original_elo_winner = self.get_elo(message['user'])
         original_elo_loser = self.get_elo(defeated_player)
 
@@ -102,22 +104,30 @@ class RecordCommand(BaseCommand):
                             }
                         )
 
+            # fetch the new elo score after the match has been recorded
+            # TODO remove this additional API call by nesting a player
+            # serializer in the match serializer response
             updated_elo_winner = self.get_elo(message['user'])
             updated_elo_loser = self.get_elo(defeated_player)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
-            delta_elo_loser = updated_elo_loser - original_elo_loser
+            delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
 
-            return 'Victory recorded for {winner}[E {uew} ({ow}{dew})] against {loser}[E {uel} ({ol}{del})] ! :{emoji}:'.format(
+            victory_msg = (
+                "Victory recorded for {winner}! "
+                "{winner} gained {delta_elo_winner} elo points, giving a new "
+                "total of {winner_total}. {loser} lost {delta_elo_loser} "
+                "points, giving them a new total of {loser_total}! :{emoji}:"
+            )
+
+            return victory_msg.format(
                 winner=self.poolbot.get_username(message['user']),
+                loser=self.poolbot.get_username(defeated_player),
+                delta_elo_winner=delta_elo_winner,
+                delta_elo_loser=delta_elo_loser,
+                winner_total=updated_elo_winner,
+                loser_total=updated_elo_loser,
                 emoji=self.get_emojis(),
-                loser=defeated_player,
-                uew=updated_elo_winner,
-                dew=delta_elo_winner,
-                uel=updated_elo_loser,
-                del=delta_elo_loser,
-                ow=("-" if delta_elo_winner < 0 else "+"),
-                ol=("-" if delta_elo_loser < 0 else "+")
             )
         else:
             return 'Sorry, I was unable to record that result.'
@@ -125,14 +135,16 @@ class RecordCommand(BaseCommand):
         # eg highlight an unbetean run, or X consequtive lose etc
 
     def get_elo(self, player):
+        """Find a players elo points by hitting the player API endpoint."""
+        base_url = '/api/player/{player}'.format(player=player)
         response = self.poolbot.session.get(
-            self.poolbot.generate_url('/api/player/{player}'.format(player=player))
+            self.poolbot.generate_url(base_url)
         )
         if response.status_code == 200:
             data = response.json()
             elo = int(data['elo'])
             return elo
-        else
+        else:
             return 0
 
     def get_emojis(self):
