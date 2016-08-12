@@ -165,8 +165,8 @@ class PoolBot(object):
 
                 # cache all users in memory too with their player profile
                 user_id = user['id']
-                user['player_profile'] = player_profiles[user_id]
                 self.users[user_id] = user
+                self.set_player_profile(user_id, player_profiles[user_id])
 
                 if user['id'] not in player_profiles.keys():
                     self.session.post(
@@ -200,7 +200,8 @@ class PoolBot(object):
         return self.users[user_id]['player_profile']
 
     def set_player_profile(self, user_id, data):
-        """Set the cache player profile."""
+        """Set the cache player profile, capitalizing the name for messages."""
+        data['name'] = data['name'].title()
         self.users[user_id]['player_profile'] = data
 
     def generate_url(self, path):
