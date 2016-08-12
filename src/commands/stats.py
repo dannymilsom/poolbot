@@ -12,8 +12,8 @@ class StatsCommand(BaseCommand):
         'to retrieve your own stats.'
     )
     response_msg = (
-        '{player} has played {game_count} games '
-        '(E {elo} / W {win_count} / L {loss_count})'
+        '{name} has played {total_match_count} games '
+        '(E {elo} / W {total_win_count} / L {total_loss_count})'
     )
 
     def process_request(self, message):
@@ -33,35 +33,13 @@ class StatsCommand(BaseCommand):
         response = self.poolbot.session.get(
             self._generate_url(user_id=user_id)
         )
-
         if response.status_code == 200:
             data = response.json()
-
-            player_name = data['name']
-            win_count = data['total_win_count']
-            loss_count = data['total_loss_count']
-            elo = data['elo']
-            game_count = data['total_match_count']
-
-            return self.response_msg.format(
-                player=player_name.title(),
-                game_count=game_count,
-                win_count=win_count,
-                loss_count=loss_count,
-                elo=elo
-            )
-
+            return self.response_msg.format(**data)
         else:
             return 'Sorry, I was unable to fetch that data.'
 
     def _generate_response_from_cache(self, user_id):
         """Construct the reply from the cached profile data."""
         player_profile = self.poolbot.get_player_profile(user_id)
-
-        return self.response_msg.format(
-            player=player_profile['name'].title(),
-            game_count=player_profile['total_match_count'],
-            win_count=player_profile['total_win_count'],
-            loss_count=player_profile['total_loss_count'],
-            elo=player_profile['elo']
-        )
+        return self.response_msg.format(**player_profile)
