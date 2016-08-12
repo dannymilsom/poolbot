@@ -57,7 +57,6 @@ class RecordCommand(BaseCommand):
             )
 
         # cache the elo score of each player before recording the win
-        # TODO remove this additional API call
         original_elo_winner = self.get_elo(message['user'])
         original_elo_loser = self.get_elo(defeated_player)
 
@@ -105,10 +104,9 @@ class RecordCommand(BaseCommand):
                         )
 
             # fetch the new elo score after the match has been recorded
-            # TODO remove this additional API call by nesting a player
-            # serializer in the match serializer response
-            updated_elo_winner = self.get_elo(message['user'])
-            updated_elo_loser = self.get_elo(defeated_player)
+            # and store it in the player profile cache
+            updated_elo_winner = self.get_elo(message['user'], from_cache=False)
+            updated_elo_loser = self.get_elo(defeated_player, from_cache=False)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
@@ -134,18 +132,33 @@ class RecordCommand(BaseCommand):
         # TODO generate some funny phrase to celebrate the victory
         # eg highlight an unbetean run, or X consequtive lose etc
 
-    def get_elo(self, player):
-        """Find a players elo points by hitting the player API endpoint."""
-        base_url = '/api/player/{player}'.format(player=player)
+    def get_elo(self, player, from_cache=True):
+        """Find a players elo points, via the cache or API. If we send a request
+        to the API, store the latest profile in the cache as a side effect.
+        """
+        if from_cache:
+            try:
+                player_profile = self.poolbot.get_player_profile(player)
+            except KeyError:
+                pass # we fallback to fetching via the API
+            else:
+                return player_profile['elo']
+
+        # if fetching from cache was un-successful / not intended, hit the API
+        base_url = '/api/player/{player}/'.format(player=player)
         response = self.poolbot.session.get(
             self.poolbot.generate_url(base_url)
         )
         if response.status_code == 200:
             data = response.json()
             elo = int(data['elo'])
-            return elo
+
+            # we also use this opportunity to update the cached player profle
+            self.poolbot.set_player_profile(player, data)
         else:
-            return 0
+            elo = 0
+
+        return elo
 
     def get_emojis(self):
         """Returns a random emojis to append to the victory reply."""

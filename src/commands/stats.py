@@ -2,7 +2,7 @@ from .base import BaseCommand
 
 
 class StatsCommand(BaseCommand):
-    """Returns some interesting statistics."""
+    """Returns some interesting statistics about a player."""
 
     command_term = 'stats'
     url_path = 'api/player/{user_id}/'
@@ -11,6 +11,10 @@ class StatsCommand(BaseCommand):
         'You can explicitly pass a player name, or just type `@poolbot stats` '
         'to retrieve your own stats.'
     )
+    response_msg = (
+        '{player} has played {game_count} games '
+        '(E {elo} / W {win_count} / L {loss_count})'
+    )
 
     def process_request(self, message):
         try:
@@ -18,29 +22,46 @@ class StatsCommand(BaseCommand):
         except IndexError:
             user_id = message['user']
 
-        response = self.poolbot.session.get(self._generate_url(user_id=user_id))
+        # try to use the cached player profile, falling back to the API
+        try:
+            return self._generate_response_from_cache(user_id)
+        except KeyError:
+            return self._generate_response_from_api(user_id)
+
+    def _generate_response_from_api(self, user_id):
+        """Parse the API data and transform it into a human readable message."""
+        response = self.poolbot.session.get(
+            self._generate_url(user_id=user_id)
+        )
 
         if response.status_code == 200:
-            return self._generate_response(response.json())
-        else:
-            return 'Sorry, I was unable to fetch that data.'
+            data = response.json()
 
-    def _generate_response(self, data):
-        """Parse the returned data and transform it into a human readable
-        message."""
-        player_name = data['name']
-        win_count = data['total_win_count']
-        loss_count = data['total_loss_count']
-        elo = data['elo']
-        game_count = win_count + loss_count
+            player_name = data['name']
+            win_count = data['total_win_count']
+            loss_count = data['total_loss_count']
+            elo = data['elo']
+            game_count = data['total_match_count']
 
-        return (
-            '{player} has played {game_count} games '
-            '(E {elo} / W {win_count} / L {loss_count})'.format(
+            return self.response_msg.format(
                 player=player_name.title(),
                 game_count=game_count,
                 win_count=win_count,
                 loss_count=loss_count,
                 elo=elo
             )
+
+        else:
+            return 'Sorry, I was unable to fetch that data.'
+
+    def _generate_response_from_cache(self, user_id):
+        """Construct the reply from the cached profile data."""
+        player_profile = self.poolbot.get_player_profile(user_id)
+
+        return self.response_msg.format(
+            player=player_profile['name'].title(),
+            game_count=player_profile['total_match_count'],
+            win_count=player_profile['total_win_count'],
+            loss_count=player_profile['total_loss_count'],
+            elo=player_profile['elo']
         )

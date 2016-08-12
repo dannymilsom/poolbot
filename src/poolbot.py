@@ -148,7 +148,12 @@ class PoolBot(object):
         # get all users currently stored in the datastore
         player_api_url = self.generate_url('api/player/')
         response = self.session.get(player_api_url)
-        stored_ids = [user['slack_id'] for user in response.json()]
+
+        # we want to cache the players profile returned from the API so we 
+        # have quick local access to the elo score and total win/loss count
+        player_profiles = {
+            player['slack_id']: player for player in response.json()
+        }
 
         self.users = {}
         all_users = self.client.api_call('users.list')
@@ -158,10 +163,12 @@ class PoolBot(object):
                 if user['name'] == 'slackbot' or user.get('is_bot', False):
                     continue
 
-                # cache all users in memory too
-                self.users[user['id']] = user
+                # cache all users in memory too with their player profile
+                user_id = user['id']
+                user['player_profile'] = player_profiles[user_id]
+                self.users[user_id] = user
 
-                if user['id'] not in stored_ids:
+                if user['id'] not in player_profiles.keys():
                     self.session.post(
                         player_api_url,
                         data={
@@ -187,6 +194,14 @@ class PoolBot(object):
         memory dictionary of registered users."""
         name = self.users.get(user_id)['name']
         return name.title() if capitalize else name
+
+    def get_player_profile(self, user_id):
+        """Fetch the cached player profile."""
+        return self.users[user_id]['player_profile']
+
+    def set_player_profile(self, user_id, data):
+        """Set the cache player profile."""
+        self.users[user_id]['player_profile'] = data
 
     def generate_url(self, path):
         """Join the host portion of the URL with the provided path."""

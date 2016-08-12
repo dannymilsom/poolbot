@@ -21,12 +21,16 @@ class ProfileCommand(BaseCommand):
         url = self._generate_url(user_id=user_id)
 
         if not args:
-            # fetch the profile data of the message author
-            response = self.poolbot.session.get(url)
-
-            if response.status_code == 200:
-                profile_attrs = response.json()
+            # fetch the profile data of the message author from cache/API
+            try:
+                profile_attrs = self.poolbot.get_player_profile(user_id)
                 return self._get_profile_representation(profile_attrs)
+            except KeyError:
+                response = self.poolbot.session.get(url)
+                if response.status_code == 200:
+                    profile_attrs = response.json()
+                    self.poolbot.set_player_profile(user_id, profile_attrs)
+                    return self._get_profile_representation(profile_attrs)
 
         if args[0] == 'set':
             # trying to update some property on the user profile
@@ -38,6 +42,7 @@ class ProfileCommand(BaseCommand):
             )
             if response.status_code == 200:
                 profile_attrs = response.json()
+                self.poolbot.set_player_profile(user_id, profile_attrs)
                 return self._get_profile_representation(profile_attrs, update=True)
 
         return 'Sorry, I was unable to fetch that data.'
