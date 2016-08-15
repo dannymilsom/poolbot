@@ -111,7 +111,7 @@ class GrannyCommand(BaseCommand):
         table_rows = []
 
         for player in data:
-            if player['total_win_count'] or player['total_loss_count']:
+            if player['total_grannies_given_count'] or player['total_grannies_taken_count']:
                 table_rows.append(table_row_msg.format(
                     ranking=len(table_rows) + 1,
                     name=player['name'],
