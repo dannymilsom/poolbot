@@ -15,11 +15,11 @@ class SpreeCommand(BaseCommand):
         2: ('is on a', 'Double Kill', ''),
         3: ('is on a', 'Triple Kill', ''),
         4: ('has commited', 'Overkill', ''),
-        5: ('...', 'Killtacular', ''),
-        6: ('...', 'Killtrocity', ''),
-        7: ('...', 'Killamanjaro', ''),
-        8: ('...', 'Killtastrophe', ''),
-        9: ('...', 'Killpocalypse', ''),
+        5: ('is', 'Killtacular', ''),
+        6: ('has commited', 'Killtrocity', ''),
+        7: ('is climbing', 'Killamanjaro', ''),
+        8: ('has caused a', 'Killtastrophe', ''),
+        9: ('has started the', 'Killpocalypse', ''),
         10: ('is a', 'Killionaire', '!!!')
     }
 
