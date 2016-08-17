@@ -70,6 +70,6 @@ class SpreeCommand(BaseCommand):
                     suffix=spree[2]
                 ).strip(), [])
             else:
-                return (None, [])
+                return self.reply(None)
         else:
-            return ('Unable to get spree data', [])
+            return self.reply('Unable to get spree data')

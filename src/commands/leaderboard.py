@@ -27,9 +27,9 @@ class LeaderboardCommand(BaseCommand):
 
         if response.status_code == 200:
             limit = self._calculate_limit(message)
-            return (self._generate_response(response.json(), limit), [])
+            return self.reply(self._generate_response(response.json(), limit))
         else:
-            return ('Unable to get leadboard data', [])
+            return self.reply('Unable to get leadboard data')
 
     def _calculate_limit(self, message):
         """Parse the message to see if an additional parameter was passed

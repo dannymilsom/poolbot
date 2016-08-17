@@ -21,9 +21,9 @@ class GrannyCommand(BaseCommand):
         try:
             user_id = self._find_user_mentions(message)[0]
         except IndexError:
-            return (self._get_granny_leaderboard(message), [])
+            return self.reply(self._get_granny_leaderboard(message))
         else:
-            return (self._get_player_grannies(user_id), [])
+            return self.reply(self._get_player_grannies(user_id))
 
     def _get_player_grannies(self, user_id):
         """Get the details of all grannies a player has given / recieved."""

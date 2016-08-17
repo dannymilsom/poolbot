@@ -25,6 +25,11 @@ class BaseCommand(object):
         for poolbot to post back to the channel."""
         return NotImplemented()
 
+    def reply(self, message, callbacks=None):
+        if callbacks is None:
+            callbacks = []
+        return (message, callbacks)
+
     def setup(self):
         """Perform some actions when the poolbot client loads, in preperation
         for message processing."""

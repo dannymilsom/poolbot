@@ -38,9 +38,11 @@ class FormCommand(BaseCommand):
         )
 
         if response.status_code == 200:
-            return ('Recent results for {user_name}: `{results}`'.format(
-                user_name=self.poolbot.users[user_id]['name'],
-                results=response.content
-            ), [])
+            return self.reply(
+                'Recent results for {user_name}: `{results}`'.format(
+                    user_name=self.poolbot.users[user_id]['name'],
+                    results=response.content
+                )
+            )
         else:
-            return ('Unable to get form data', [])
+            return self.reply('Unable to get form data')

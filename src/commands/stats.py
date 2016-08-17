@@ -24,9 +24,9 @@ class StatsCommand(BaseCommand):
 
         # try to use the cached player profile, falling back to the API
         try:
-            return (self._generate_response_from_cache(user_id), [])
+            return self.reply(self._generate_response_from_cache(user_id))
         except KeyError:
-            return (self._generate_response_from_api(user_id), [])
+            return self.reply(self._generate_response_from_api(user_id))
 
     def _generate_response_from_api(self, user_id):
         """Parse the API data and transform it into a human readable message."""
