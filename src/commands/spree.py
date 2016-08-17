@@ -23,6 +23,21 @@ class SpreeCommand(BaseCommand):
         10: ('is a', 'Killionaire', '!!!')
     }
 
+    HIGHEST_SPREE = max(SPREE_TABLE.keys())
+
+    def calculate_spree(self, record):
+        record = record[::-1]
+        record = record.split()
+        spree = 0
+        for entry in record:
+            if entry == 'W':
+                spree += 1
+                continue
+            break
+        if spree > self.HIGHEST_SPREE:
+            spree = self.HIGHEST_SPREE
+        return self.SPREE_TABLE.get(spree, None)
+
     def process_request(self, message):
         """Get the recent match results for the user mentioned in the text."""
         try:
@@ -46,8 +61,7 @@ class SpreeCommand(BaseCommand):
         )
 
         if response.status_code == 200:
-            record = response.content.count('W')
-            spree = self.SPREE_TABLE.get(record, None)
+            spree = self.calculate_spree(response.content)
             if spree:
                 return ('{user_name} {prefix} {spree} {suffix}'.format(
                     self.poolbot.users[user_id]['name'],
