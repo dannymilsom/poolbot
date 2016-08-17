@@ -1,7 +1,5 @@
 import random
-
 from .base import BaseCommand
-from commands.spree import SpreeCommand
 
 
 class RecordCommand(BaseCommand):
@@ -130,7 +128,7 @@ class RecordCommand(BaseCommand):
                 winner_total=updated_elo_winner,
                 loser_total=updated_elo_loser,
                 emoji=self.get_emojis(),
-            ), [SpreeCommand, ])
+            ), ['spree', ])
         else:
             return ('Sorry, I was unable to record that result.', [])
         # TODO generate some funny phrase to celebrate the victory

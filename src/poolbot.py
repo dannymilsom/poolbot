@@ -119,8 +119,8 @@ class PoolBot(object):
             channel.send_message(reply)
         if callbacks:
             for callback in callbacks:
-                self.execute_handler(callback, message)
-
+                message['text'] = callback
+                self.read_input(message)
 
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
