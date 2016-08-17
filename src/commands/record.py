@@ -1,6 +1,7 @@
 import random
 
 from .base import BaseCommand
+from commands.spree import SpreeCommand
 
 
 class RecordCommand(BaseCommand):
@@ -43,18 +44,21 @@ class RecordCommand(BaseCommand):
         try:
             defeated_player = self._find_user_mentions(message)[0]
         except IndexError:
-            return 'Sorry, I was unable to find an opponent in that message...'
+            return (
+                'Sorry, I was unable to find an opponent in that message...',
+                []
+            )
 
         lower_text = message['text'].lower()
         if not any(noun in lower_text for noun in self.victory_nouns):
-            return (
+            return ((
                 'Sorry, I am unable to determine the result. Record a win by '
                 'posting a message like `record beat @opponent`. You can '
                 'replace `beat` with any word from the following list:\n'
                 '`{victory_nouns}`'.format(
-                    victory_nouns = ', '.join(noun for noun in self.victory_nouns)
+                    victory_nouns=', '.join(noun for noun in self.victory_nouns)
                 )
-            )
+            ), [])
 
         # cache the elo score of each player before recording the win
         original_elo_winner = self.get_elo(message['user'])
@@ -118,7 +122,7 @@ class RecordCommand(BaseCommand):
                 "points, giving them a new total of {loser_total}! :{emoji}:"
             )
 
-            return victory_msg.format(
+            return (victory_msg.format(
                 winner=self.poolbot.get_username(message['user']),
                 loser=self.poolbot.get_username(defeated_player),
                 delta_elo_winner=delta_elo_winner,
@@ -126,9 +130,9 @@ class RecordCommand(BaseCommand):
                 winner_total=updated_elo_winner,
                 loser_total=updated_elo_loser,
                 emoji=self.get_emojis(),
-            )
+            ), [SpreeCommand, ])
         else:
-            return 'Sorry, I was unable to record that result.'
+            return ('Sorry, I was unable to record that result.', [])
         # TODO generate some funny phrase to celebrate the victory
         # eg highlight an unbetean run, or X consequtive lose etc
 

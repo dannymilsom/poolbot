@@ -24,13 +24,16 @@ class ProfileCommand(BaseCommand):
             # fetch the profile data of the message author from cache/API
             try:
                 profile_attrs = self.poolbot.get_player_profile(user_id)
-                return self._get_profile_representation(profile_attrs)
+                return (self._get_profile_representation(profile_attrs), [])
             except KeyError:
                 response = self.poolbot.session.get(url)
                 if response.status_code == 200:
                     profile_attrs = response.json()
                     self.poolbot.set_player_profile(user_id, profile_attrs)
-                    return self._get_profile_representation(profile_attrs)
+                    return (
+                        self._get_profile_representation(profile_attrs),
+                        []
+                    )
 
         if args[0] == 'set':
             # trying to update some property on the user profile
@@ -43,9 +46,9 @@ class ProfileCommand(BaseCommand):
             if response.status_code == 200:
                 profile_attrs = response.json()
                 self.poolbot.set_player_profile(user_id, profile_attrs)
-                return self._get_profile_representation(profile_attrs, update=True)
+                return (self._get_profile_representation(profile_attrs, update=True), [])
 
-        return 'Sorry, I was unable to fetch that data.'
+        return ('Sorry, I was unable to fetch that data.', [])
 
     def _get_profile_representation(self, profile_data, update=False):
         """Parse the profile data to remove fields we don't want to expose,

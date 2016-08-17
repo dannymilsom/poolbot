@@ -63,7 +63,7 @@ class ChallengeCommand(BaseCommand):
                     )
                 )
             else:
-                return self._get_validation_error(response)
+                return (self._get_validation_error(response), [])
 
         # otherwise find the channel challenge instance and update the players
         elif command_args[0] == 'accept':
@@ -78,16 +78,16 @@ class ChallengeCommand(BaseCommand):
 
             if response.status_code == 200:
                 data = response.json()
-                return (
+                return ((
                     'To the baize! {initiator} vs {challenger}'.format(
                         initiator=self.poolbot.get_username(data['initiator']),
                         challenger=self.poolbot.get_username(author)
                     )
-                )
+                ), [])
             else:
-                return self._get_validation_error(response)
+                return (self._get_validation_error(response), [])
         else:
-            return 'Sorry, something went wrong.'
+            return ('Sorry, something went wrong.', [])
 
     def _get_channel_challenge(self, channel):
         """Retrives the channel speicifc challenge instance."""
