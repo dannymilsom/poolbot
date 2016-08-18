@@ -88,7 +88,7 @@ class ChallengeCommand(BaseCommand):
             else:
                 return self.reply(self._get_validation_error(response))
         else:
-            return ('Sorry, something went wrong.', [])
+            return self.reply('Sorry, something went wrong.')
 
     def _get_channel_challenge(self, channel):
         """Retrives the channel speicifc challenge instance."""
