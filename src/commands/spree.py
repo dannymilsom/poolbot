@@ -68,7 +68,7 @@ class SpreeCommand(BaseCommand):
             if spree:
                 return self.reply(
                     '{username} {prefix} {spree} {suffix}'.format(
-                        username=self.poolbot.users[user_id]['name'],
+                        username=self.poolbot.get_username(user_id),
                         prefix=spree[0],
                         spree=spree[1],
                         suffix=spree[2],
