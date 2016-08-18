@@ -31,4 +31,4 @@ class HelpCommand(BaseCommand):
             )
             reply = template.format(command_list=commands)
 
-        return reply
+        return self.reply(reply)

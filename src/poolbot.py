@@ -109,11 +109,30 @@ class PoolBot(object):
                     handler = reaction
                     break
 
-        reply = handler.process_request(message) if handler else None
+        if handler:
+            self.execute_handler(handler, message)
 
-        if reply is not None:
+    def execute_handler(self, handler, message):
+        """Execute a handler and all its callbacks."""
+        if handler:
+            reply, callbacks = handler.process_request(message)
+        else:
+            reply, callbacks = (None, [])
+
+        if reply:
             channel = self.get_channel(message['channel'])
             channel.send_message(reply)
+
+        callback_replies = self.execute_callback_replies(callbacks, message)
+
+    def execute_callback_replies(self, callbacks, message):
+        """Match any callback strings with their handlers and execute."""
+        for callback in callbacks:
+            message['text'] = callback
+            for command in self.commands:
+                if command.match_request(callback):
+                    handler = command
+                    self.execute_handler(handler, message)
 
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
@@ -149,7 +168,7 @@ class PoolBot(object):
         player_api_url = self.generate_url('api/player/')
         response = self.session.get(player_api_url)
 
-        # we want to cache the players profile returned from the API so we 
+        # we want to cache the players profile returned from the API so we
         # have quick local access to the elo score and total win/loss count
         player_profiles = {
             player['slack_id']: player for player in response.json()

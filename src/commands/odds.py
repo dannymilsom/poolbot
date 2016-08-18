@@ -7,4 +7,4 @@ class OddsCommand(BaseCommand):
     command_term = 'odds'
 
     def process_request(self, message):
-        return 'Sorry this command is not implemented yet...'
+        return self.reply('Sorry this command is not implemented yet...')

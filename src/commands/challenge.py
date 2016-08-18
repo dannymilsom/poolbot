@@ -57,13 +57,14 @@ class ChallengeCommand(BaseCommand):
             )
 
             if response.status_code == 200:
-                return (
-                    'New challenge created by {initiator}! Who wants to play?'.format(
+                return self.reply(
+                    'New challenge created by {initiator}! Who wants to play?'
+                    .format(
                         initiator=self.poolbot.get_username(author)
                     )
                 )
             else:
-                return self._get_validation_error(response)
+                return self.reply(self._get_validation_error(response))
 
         # otherwise find the channel challenge instance and update the players
         elif command_args[0] == 'accept':
@@ -78,16 +79,16 @@ class ChallengeCommand(BaseCommand):
 
             if response.status_code == 200:
                 data = response.json()
-                return (
+                return self.reply(
                     'To the baize! {initiator} vs {challenger}'.format(
                         initiator=self.poolbot.get_username(data['initiator']),
                         challenger=self.poolbot.get_username(author)
                     )
                 )
             else:
-                return self._get_validation_error(response)
+                return self.reply(self._get_validation_error(response))
         else:
-            return 'Sorry, something went wrong.'
+            return self.reply('Sorry, something went wrong.')
 
     def _get_channel_challenge(self, channel):
         """Retrives the channel speicifc challenge instance."""

@@ -22,7 +22,9 @@ class HeadToHeadCommand(BaseCommand):
     def process_request(self, message):
         mentioned_user_ids = self._find_user_mentions(message)
         if not len(mentioned_user_ids):
-            return 'Sorry, I was unable to find two users in that message...'
+            return self.reply(
+                'Sorry, I was unable to find two users in that message...'
+            )
 
         try:
             player1 = mentioned_user_ids[0]
@@ -57,14 +59,14 @@ class HeadToHeadCommand(BaseCommand):
             try:
                 winning_percentage = ((data[most_wins] * 100) / total_games)
             except ZeroDivisionError:
-                return (
+                return self.reply(
                     '{player1} and {player2} are yet to record any games!'.format(
                         player1=self.poolbot.get_username(player1),
                         player2=self.poolbot.get_username(player2)
                     )
                 )
 
-            return reply_text.format(
+            return self.reply(reply_text.format(
                 winner=self.poolbot.get_username(most_wins),
                 loser=self.poolbot.get_username(most_loses),
                 winner_win_count=data[most_wins],
@@ -72,9 +74,9 @@ class HeadToHeadCommand(BaseCommand):
                 winner_ratio='{percent:.0f}%'.format(percent=winning_percentage),
                 recent_game_count=data['history_count'],
                 recent_games=self._format_recent_matches(data['history'])
-            )
+            ))
         else:
-            return 'Sorry, I was unable to get head to head data!'
+            return self.reply('Sorry, I was unable to get head to head data!')
 
     def _format_recent_matches(self, matches):
         ordered_matches = sorted(matches, key=itemgetter('date'), reverse=True)

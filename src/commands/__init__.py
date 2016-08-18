@@ -8,3 +8,4 @@ from odds import OddsCommand
 from profile import ProfileCommand
 from record import RecordCommand
 from stats import StatsCommand
+from spree import SpreeCommand
