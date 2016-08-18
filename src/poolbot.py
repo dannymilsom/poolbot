@@ -108,19 +108,31 @@ class PoolBot(object):
                 if reaction.match_request(message):
                     handler = reaction
                     break
-        self.execute_handler(handler, message)
+
+        if handler:
+            self.execute_handler(handler, message)
 
     def execute_handler(self, handler, message):
-        """Execute a handler"""
-        reply, callbacks = handler.process_request(message) if handler else None
+        """Execute a handler and all its callbacks."""
+        if handler:
+            reply, callbacks = handler.process_request(message)
+        else:
+            reply, callbacks = (None, [])
 
-        if reply is not None:
+        if reply:
             channel = self.get_channel(message['channel'])
             channel.send_message(reply)
-        if callbacks:
-            for callback in callbacks:
-                message['text'] = callback
-                self.read_input(message)
+
+        callback_replies = self.execute_callback_replies(callbacks, message)
+
+    def execute_callback_replies(self, callbacks, message):
+        """Match any callback strings with their handlers and execute."""
+        for callback in callbacks:
+            message['text'] = callback
+            for command in self.commands:
+                if command.match_request(callback):
+                    handler = command
+                    self.execute_handler(handler, message)
 
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
