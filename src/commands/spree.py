@@ -1,3 +1,5 @@
+from collections import Counter
+
 from .base import BaseCommand
 
 
@@ -28,14 +30,15 @@ class SpreeCommand(BaseCommand):
     def calculate_spree(self, record):
         record = record[::-1]
         record = record.split()
-        spree = 0
-        for entry in record:
-            if entry == 'W':
-                spree += 1
-                continue
-            break
+
+        # get the number of wins in their last ten games
+        record_counter = Counter(record)
+        spree = record_counter['W']
+
+        # cover cases where the number is higher than the spree table max
         if spree > self.HIGHEST_SPREE:
             spree = self.HIGHEST_SPREE
+
         return self.SPREE_TABLE.get(spree, None)
 
     def process_request(self, message):
@@ -63,13 +66,16 @@ class SpreeCommand(BaseCommand):
         if response.status_code == 200:
             spree = self.calculate_spree(response.content)
             if spree:
-                return ('{user_name} {prefix} {spree} {suffix}'.format(
-                    self.poolbot.users[user_id]['name'],
-                    prefix=spree[0],
-                    spree=spree[1],
-                    suffix=spree[2]
-                ).strip(), [])
+                return self.reply(
+                    '{username} {prefix} {spree} {suffix}'.format(
+                        username=self.poolbot.users[user_id]['name'],
+                        prefix=spree[0],
+                        spree=spree[1],
+                        suffix=spree[2],
+                    )
+                )
             else:
-                return self.reply(None)
+                return self.reply('')
+
         else:
             return self.reply('Unable to get spree data')
