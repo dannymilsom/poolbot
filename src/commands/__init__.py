@@ -1,4 +1,5 @@
 from challenge import ChallengeCommand
+from elo import EloCommand
 from form import FormCommand
 from granny import GrannyCommand
 from head_to_head import HeadToHeadCommand
