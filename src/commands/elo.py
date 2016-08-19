@@ -35,8 +35,10 @@ class EloCommand(BaseCommand):
             data = response.json()
 
             reply_text = (
-                '*{player}* [E: {elo} / W: {elo_win} (+{points_win}) / '
-                'L: {elo_lose} (-{points_lose})]'
+                '{player} currently has elo {elo} points. A win would be worth '
+                '{points_win} points, giving a new total of {elo_win}. A loss '
+                'would cost them {points_lose} points reducing them to '
+                '{elo_lose}.\n'
             )
             ret = []
 
