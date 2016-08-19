@@ -1,5 +1,3 @@
-from collections import Counter
-
 from .base import BaseCommand
 
 
@@ -31,15 +29,21 @@ class SpreeCommand(BaseCommand):
         record = record[::-1]
         record = record.split()
 
-        # get the number of wins in their last ten games
-        record_counter = Counter(record)
-        spree = record_counter['W']
+        spree = 0
+        for entry in record:
+            entry = entry.replace('"', '')
+            if entry == 'W':
+                spree += 1
+            else:
+                break
 
         # cover cases where the number is higher than the spree table max
         if spree > self.HIGHEST_SPREE:
             spree = self.HIGHEST_SPREE
 
-        return self.SPREE_TABLE.get(spree, None)
+        spree_msg = self.SPREE_TABLE.get(spree, None)
+
+        return spree_msg, spree
 
     def process_request(self, message):
         """Get the recent match results for the user mentioned in the text."""
@@ -64,14 +68,15 @@ class SpreeCommand(BaseCommand):
         )
 
         if response.status_code == 200:
-            spree = self.calculate_spree(response.content)
+            spree, spree_count = self.calculate_spree(response.content)
             if spree:
                 return self.reply(
-                    '{username} {prefix} {spree} {suffix}'.format(
+                    '{username} {prefix} {spree} {suffix} ({count} consecutive wins)'.format(
                         username=self.poolbot.get_username(user_id),
                         prefix=spree[0],
                         spree=spree[1],
                         suffix=spree[2],
+                        count=spree_count,
                     )
                 )
             else:
