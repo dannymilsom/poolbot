@@ -14,7 +14,7 @@ class EloCommand(BaseCommand):
     def process_request(self, message):
         mentioned_user_ids = self._find_user_mentions(message)
         if not len(mentioned_user_ids):
-            return 'Sorry, you must mention at least one user.'
+            return self.reply('Sorry, you must mention at least one user.')
 
         try:
             player1 = mentioned_user_ids[0]
