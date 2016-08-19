@@ -26,7 +26,6 @@ class SpreeCommand(BaseCommand):
     HIGHEST_SPREE = max(SPREE_TABLE.keys())
 
     def calculate_spree(self, record):
-        record = record[::-1]
         record = record.split()
 
         spree = 0
