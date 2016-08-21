@@ -41,6 +41,10 @@ To get the development environment up and running follow these steps...
    a post save signal for every user, so you just need to look at the `Token` model via django admin and copy the token key.
 3. Finally run `python poolbot.py` and all messages sent by the slack RTM API in rooms which your custom bot are in, will be consumed by poolbot.
 
+## Tests
+
+To run the tests, assuming you have installed `nose` (it is listed in `requirements.txt`), simply run `nosetests` from the project root on the command line.
+
 ## Wish List
 
 * Leaderboard for a duration (day/week/month/year/alltime)
