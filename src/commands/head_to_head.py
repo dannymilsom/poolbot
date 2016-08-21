@@ -20,7 +20,7 @@ class HeadToHeadCommand(BaseCommand):
     )
 
     def process_request(self, message):
-        mentioned_user_ids = self._find_user_mentions(message)
+        mentioned_user_ids = self._find_user_mentions(message['text'])
         if not len(mentioned_user_ids):
             return self.reply(
                 'Sorry, I was unable to find two users in that message...'

@@ -47,7 +47,7 @@ class SpreeCommand(BaseCommand):
     def process_request(self, message):
         """Get the recent match results for the user mentioned in the text."""
         try:
-            user_id = self._find_user_mentions(message)[0]
+            user_id = self._find_user_mentions(message['text'])[0]
         except IndexError:
             user_id = message['user']
 

@@ -35,10 +35,10 @@ class BaseCommand(object):
         for message processing."""
         pass
 
-    def _find_user_mentions(self, message):
+    def _find_user_mentions(self, text):
         """Parses the message text and returns all user ids mentioned excluding
         poolbot."""
-        user_mentions = re.findall(self.mention_regex, message['text'])
+        user_mentions = re.findall(self.mention_regex, text)
         user_ids = [mention.strip('@<>') for mention in user_mentions]
         return [user_id for user_id in user_ids if user_id != self.poolbot.bot_id]
 

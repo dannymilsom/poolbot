@@ -19,7 +19,7 @@ class GrannyCommand(BaseCommand):
     def process_request(self, message):
         """Hit the players API to get all player profile data."""
         try:
-            user_id = self._find_user_mentions(message)[0]
+            user_id = self._find_user_mentions(message['text'])[0]
         except IndexError:
             return self.reply(self._get_granny_leaderboard(message))
         else:

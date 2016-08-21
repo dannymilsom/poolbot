@@ -18,7 +18,7 @@ class StatsCommand(BaseCommand):
 
     def process_request(self, message):
         try:
-            user_id = self._find_user_mentions(message)[0]
+            user_id = self._find_user_mentions(message['text'])[0]
         except IndexError:
             user_id = message['user']
 
