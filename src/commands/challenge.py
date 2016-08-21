@@ -19,22 +19,22 @@ class ChallengeCommand(BaseCommand):
         """Each channel poolbot is in requires a unique challenge instance.
         To avoid the overhead when processing messages, POST to create the
         missing ones when poolbot loads."""
-        response = self.poolbot.session.get(self._generate_url())
-        if response.status_code == 200:
-            challenge_channels = set(
-                [challenge['channel'] for challenge in response.json()]
-            )
+        # response = self.poolbot.session.get(self._generate_url())
+        # if response.status_code == 200:
+        #     challenge_channels = set(
+        #         [challenge['channel'] for challenge in response.json()]
+        #     )
 
-        all_poolbot_channels = set(self.poolbot.poolbot_channels)
-        missing_channels = all_poolbot_channels.difference(challenge_channels)
+        # all_poolbot_channels = set(self.poolbot.poolbot_channels)
+        # missing_channels = all_poolbot_channels.difference(challenge_channels)
 
-        for channel_id in missing_channels:
-            response = self.poolbot.session.post(
-                self._generate_url(),
-                data={
-                    'channel': channel_id,
-                }
-            )
+        # for channel_id in missing_channels:
+        #     response = self.poolbot.session.post(
+        #         self._generate_url(),
+        #         data={
+        #             'channel': channel_id,
+        #         }
+        #     )
 
     def process_request(self, message):
         """The two main commands to interpret are:
