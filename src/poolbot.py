@@ -1,8 +1,9 @@
 """Pool focused slack bot which interacts via a RTM websocket."""
 
+import os
 import inspect
 import importlib
-import requests
+from requests import Session
 from time import sleep
 from urlparse import urljoin
 import yaml
@@ -15,11 +16,12 @@ from utils import MissingConfigurationException
 class PoolBot(object):
     """Records pool results and much more using a custom slack bot."""
 
-    CONFIG_FILENAME = 'config.yaml'
     PLUGIN_DIRS = ('commands', 'reactions')
     REQUIRED_SETTINGS = ('api_token', 'bot_id', 'server_host', 'server_token')
 
-    def __init__(self):
+    def __init__(self, config_path='config.yaml'):
+        self.config_path = config_path
+
         # load config settings from yaml file
         self.load_config()
 
@@ -42,12 +44,12 @@ class PoolBot(object):
     def load_config(self):
         """Load the configuration settings from a YAML file."""
         try:
-            with open(self.CONFIG_FILENAME, 'r') as f:
+            with open(self.config_path, 'r') as f:
                 self.config = yaml.load(f)
         except IOError:
             raise MissingConfigurationException(
                     'A {} file must be present in the app directory'.format(
-                        self.CONFIG_FILENAME
+                        self.config_path
                     )
                 )
 
@@ -58,7 +60,7 @@ class PoolBot(object):
                 raise MissingConfigurationException(
                     'Please add a {} setting to the {} file.'.format(
                         setting,
-                        self.CONFIG_FILENAME
+                        self.config_path
                     )
                 )
 
@@ -228,7 +230,7 @@ class PoolBot(object):
         return urljoin(self.server_host, path)
 
     def prepare_requests_session(self):
-        self.session = requests.Session()
+        self.session = Session()
         self.session.headers.update(
             {'Authorization': 'Token {token}'.format(token=self.server_token)}
         )

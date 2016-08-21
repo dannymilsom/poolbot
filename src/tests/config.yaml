@@ -1,0 +1,11 @@
+# BASE SETINGS
+
+api_token: cn737dskndsjfn323r23
+bot_id: A34FD343A
+server_host: http://test-server.com/
+server_token: mbd637dsdsdf8332sdf21
+
+# COMMAND / PLUGIN SETTINGS
+
+record_emojis:
+  - beers
