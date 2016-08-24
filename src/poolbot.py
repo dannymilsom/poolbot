@@ -201,8 +201,8 @@ class PoolBot(object):
     def store_user(self, user_id):
         """Store a single user in the server side datastore."""
         user_details = self.client.api_call('users.info', user=user_id)
-        url = self.generate_url('api/player')
-        response = self.session.post(
+        url = self.generate_url('api/player/')
+        self.session.post(
             url,
             data={
                 'name': user_details['user']['name'],
