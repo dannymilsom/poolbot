@@ -104,6 +104,10 @@ class RecordCommandTestCase(BaseCommandTestCase):
                 winner_total=player.PLAYER_1['elo'],
                 loser_total=player.PLAYER_2['elo'],
                 emoji=self.record_cmd._get_emojis(),
+                position_winner=1,
+                position_loser=2,
+                delta_position_winner=0,
+                delta_position_loser=0,
             ),
         )
 

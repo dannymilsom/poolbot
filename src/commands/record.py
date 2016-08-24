@@ -53,9 +53,11 @@ class RecordCommand(BaseCommand):
     )
     victory_message = (
         'Victory recorded for {winner}! {winner} gained {delta_elo_winner} elo '
-        'points, giving a new total of {winner_total}. {loser} lost '
-        '{delta_elo_loser} points, giving them a new total of '
-        '{loser_total}! :{emoji}:'
+        'points, giving a new total of {winner_total}. {winner} has '
+        '{position_winner} place in the leaderboard now (:arrow_up: '
+        '{delta_position_winner}). {loser} lost {delta_elo_loser} points, giving '
+        'them a new total of {loser_total}. {loser} has {position_loser} place '
+        'in the leaderboard now (:arrow_down: {delta_position_loser}). :{emoji}:'
     )
 
     def process_request(self, message):
@@ -82,6 +84,10 @@ class RecordCommand(BaseCommand):
         # cache the elo score of each player before recording the win
         original_elo_winner = self._get_elo(msg_author)
         original_elo_loser = self._get_elo(defeated_player)
+        
+        # cache the leaderboard position of each player before recording the win
+        original_position_winner = self._get_leaderboard_position(msg_author)
+        original_position_loser = self._get_leaderboard_position(defeated_player)
 
         response = self.poolbot.session.post(
             self._generate_url(),
@@ -130,9 +136,15 @@ class RecordCommand(BaseCommand):
             # and store it in the player profile cache
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
             updated_elo_loser = self._get_elo(defeated_player, from_cache=False)
+            
+            # fetch the new elo score after the match has been recorded
+            updated_position_winner = self._get_leaderboard_position(msg_author)
+            updated_position_loser = self._get_leaderboard_position(defeated_player)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
+            delta_position_winner = abs(updated_position_winner - original_position_winner)
+            delta_position_loser = updated_position_loser - original_position_loser
 
             return self.reply(
                 self.victory_message.format(
@@ -143,6 +155,10 @@ class RecordCommand(BaseCommand):
                     winner_total=updated_elo_winner,
                     loser_total=updated_elo_loser,
                     emoji=self._get_emojis(),
+                    delta_position_winner=delta_position_winner,
+                    delta_position_loser=delta_position_loser,
+                    position_winner=updated_position_winner,
+                    position_loser=updated_position_loser,
                 ),
                 callbacks=['spree']
             )
@@ -150,6 +166,15 @@ class RecordCommand(BaseCommand):
             return self.reply(self.not_recorded_message)
         # TODO generate some funny phrase to celebrate the victory
         # eg highlight an unbetean run, or X consequtive lose etc
+
+    def _get_leaderboard(self):
+        """Retrieves current players positions"""
+        all_users_elo = {y: x['player_profile']['elo'] for y, x in self.poolbot.users.items()}
+        return sorted(all_users_elo, key=all_users_elo.__getitem__, reverse=True)
+        
+    def _get_leaderboard_position(self, player):
+        """Retrieves position for given player"""
+        return self._get_leaderboard().index(player) + 1
 
     def _find_defeated_player(self, text):
         """Look for a user mention in the message text."""
