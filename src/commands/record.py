@@ -86,8 +86,8 @@ class RecordCommand(BaseCommand):
         original_elo_loser = self._get_elo(defeated_player)
         
         # cache the leaderboard position of each player before recording the win
-        original_position_winner = self._get_leaderboard_position(msg_author)
-        original_position_loser = self._get_leaderboard_position(defeated_player)
+        original_position_winner = self.poolbot.get_leaderboard_position(msg_author)
+        original_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
         response = self.poolbot.session.post(
             self._generate_url(),
@@ -137,9 +137,9 @@ class RecordCommand(BaseCommand):
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
             updated_elo_loser = self._get_elo(defeated_player, from_cache=False)
             
-            # fetch the new elo score after the match has been recorded
-            updated_position_winner = self._get_leaderboard_position(msg_author)
-            updated_position_loser = self._get_leaderboard_position(defeated_player)
+            # fetch the new leaderboard position after the match has been recorded
+            updated_position_winner = self.poolbot.get_leaderboard_position(msg_author)
+            updated_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
@@ -166,15 +166,6 @@ class RecordCommand(BaseCommand):
             return self.reply(self.not_recorded_message)
         # TODO generate some funny phrase to celebrate the victory
         # eg highlight an unbetean run, or X consequtive lose etc
-
-    def _get_leaderboard(self):
-        """Retrieves current players positions"""
-        all_users_elo = {y: x['player_profile']['elo'] for y, x in self.poolbot.users.items()}
-        return sorted(all_users_elo, key=all_users_elo.__getitem__, reverse=True)
-        
-    def _get_leaderboard_position(self, player):
-        """Retrieves position for given player"""
-        return self._get_leaderboard().index(player) + 1
 
     def _find_defeated_player(self, text):
         """Look for a user mention in the message text."""
