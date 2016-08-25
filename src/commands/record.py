@@ -162,7 +162,7 @@ class RecordCommand(BaseCommand):
                     position_winner=get_ordinal_extension(updated_position_winner),
                     position_loser=get_ordinal_extension(updated_position_loser),
                     winner_emoji=self._get_position_change_emoji(delta_position_winner),
-                    loser_emoji=self._get_position_change_emoji(delta_position_loser),
+                    loser_emoji=self._get_position_change_emoji(-delta_position_loser),
                 ),
                 callbacks=['spree']
             )
