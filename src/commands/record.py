@@ -1,5 +1,7 @@
 import random
 
+from utils import get_ordinal_extension
+
 from .base import BaseCommand
 
 
@@ -52,10 +54,12 @@ class RecordCommand(BaseCommand):
         'Sorry, I was unable to record that result.'
     )
     victory_message = (
-        'Victory recorded for {winner}! {winner} gained {delta_elo_winner} elo '
-        'points, giving a new total of {winner_total}. {loser} lost '
-        '{delta_elo_loser} points, giving them a new total of '
-        '{loser_total}! :{emoji}:'
+        'Victory recorded for {winner}! :{emoji}: {winner} gained '
+        '{delta_elo_winner} elo points, giving a new total of {winner_total}. '
+        '{winner} has {position_winner} place in the leaderboard now ({winner_emoji} '
+        '{delta_position_winner}). {loser} lost {delta_elo_loser} points, giving '
+        'them a new total of {loser_total}. {loser} has {position_loser} place '
+        'in the leaderboard now ({loser_emoji} {delta_position_loser}).'
     )
 
     def process_request(self, message):
@@ -82,6 +86,10 @@ class RecordCommand(BaseCommand):
         # cache the elo score of each player before recording the win
         original_elo_winner = self._get_elo(msg_author)
         original_elo_loser = self._get_elo(defeated_player)
+        
+        # cache the leaderboard position of each player before recording the win
+        original_position_winner = self.poolbot.get_leaderboard_position(msg_author)
+        original_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
         response = self.poolbot.session.post(
             self._generate_url(),
@@ -130,9 +138,15 @@ class RecordCommand(BaseCommand):
             # and store it in the player profile cache
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
             updated_elo_loser = self._get_elo(defeated_player, from_cache=False)
+            
+            # fetch the new leaderboard position after the match has been recorded
+            updated_position_winner = self.poolbot.get_leaderboard_position(msg_author)
+            updated_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
+            delta_position_winner = abs(updated_position_winner - original_position_winner)
+            delta_position_loser = updated_position_loser - original_position_loser
 
             return self.reply(
                 self.victory_message.format(
@@ -143,6 +157,12 @@ class RecordCommand(BaseCommand):
                     winner_total=updated_elo_winner,
                     loser_total=updated_elo_loser,
                     emoji=self._get_emojis(),
+                    delta_position_winner=delta_position_winner,
+                    delta_position_loser=delta_position_loser,
+                    position_winner=get_ordinal_extension(updated_position_winner),
+                    position_loser=get_ordinal_extension(updated_position_loser),
+                    winner_emoji=self._get_position_change_emoji(delta_position_winner),
+                    loser_emoji=self._get_position_change_emoji(delta_position_loser),
                 ),
                 callbacks=['spree']
             )
@@ -192,6 +212,16 @@ class RecordCommand(BaseCommand):
             elo = 0
 
         return elo
+
+    def _get_position_change_emoji(self, position_change):
+        """Return a emoji to represent a users movement on the leaderboard."""
+        if position_change == 0:
+            emoji = 'left_right_arrow'
+        elif position_change > 0:
+            emoji = 'arrow_up'
+        elif position_change < 0:
+            emoji = 'arrow_down'
+        return ':{emoji}:'.format(emoji=emoji)
 
     def _get_emojis(self):
         """Returns a random emojis to append to the victory reply."""

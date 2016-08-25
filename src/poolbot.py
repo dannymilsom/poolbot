@@ -185,9 +185,10 @@ class PoolBot(object):
                     continue
 
                 # cache all users in memory too with their player profile
-                user_id = user['id']
-                self.users[user_id] = user
-                self.set_player_profile(user_id, player_profiles[user_id])
+                if user['id'] in player_profiles.keys():
+                    user_id = user['id']
+                    self.users[user_id] = user
+                    self.set_player_profile(user_id, player_profiles[user_id])
 
                 if user['id'] not in player_profiles.keys():
                     self.session.post(
@@ -201,8 +202,8 @@ class PoolBot(object):
     def store_user(self, user_id):
         """Store a single user in the server side datastore."""
         user_details = self.client.api_call('users.info', user=user_id)
-        url = self.generate_url('api/player')
-        response = self.session.post(
+        url = self.generate_url('api/player/')
+        self.session.post(
             url,
             data={
                 'name': user_details['user']['name'],
@@ -234,6 +235,20 @@ class PoolBot(object):
         self.session.headers.update(
             {'Authorization': 'Token {token}'.format(token=self.server_token)}
         )
+
+    def _get_leaderboard(self):
+        """Retrieves current players positions ordered by their elo score."""
+        all_users_elo = {}
+        for user_id, user in self.users.iteritems():
+            player = user['player_profile']
+            if player['total_win_count'] or player['total_loss_count']:
+                all_users_elo[user_id] = player['elo']
+
+        return sorted(all_users_elo, key=all_users_elo.get, reverse=True)
+
+    def get_leaderboard_position(self, player):
+        """Retrieves position for given player"""
+        return self._get_leaderboard().index(player) + 1
 
 
 if __name__ == '__main__':
