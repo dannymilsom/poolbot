@@ -35,6 +35,11 @@ class RecordCommand(BaseCommand):
         'spangled',
         'walloped',
     )
+    briefmode_flags = (
+        '-brief',
+        '-mini',
+        '-short'
+    )
     help_message = (
         'Record the outcome of a game between two players with the command '
         '`@poolbot record beat <opponent>`.'
@@ -61,6 +66,11 @@ class RecordCommand(BaseCommand):
         'them a new total of {loser_total}. {loser} has {position_loser} place '
         'in the leaderboard now ({loser_emoji} {delta_position_loser}).'
     )
+    victory_message_brief = (
+        '{winner} [#{old_position_winner} | {old_elo_winner}] > {loser} [#{old_position_loser} | {old_elo_loser}]'
+        '{winner} + {delta_elo_winner} = [#{position_winner} | {winner_total}]'
+        '{loser} + {delta_elo_loser} = [#{position_loser} | {loser_total}]'
+    )
 
     def process_request(self, message):
         """The message author is the winner and the mentioned user the loser."""
@@ -83,10 +93,13 @@ class RecordCommand(BaseCommand):
                 )
             )
 
+        # check if brief message mode is enabled
+        brief = self._find_briefmode_flag(message['text'].lower())
+
         # cache the elo score of each player before recording the win
         original_elo_winner = self._get_elo(msg_author)
         original_elo_loser = self._get_elo(defeated_player)
-        
+
         # cache the leaderboard position of each player before recording the win
         original_position_winner = self.poolbot.get_leaderboard_position(msg_author)
         original_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
@@ -138,7 +151,7 @@ class RecordCommand(BaseCommand):
             # and store it in the player profile cache
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
             updated_elo_loser = self._get_elo(defeated_player, from_cache=False)
-            
+
             # fetch the new leaderboard position after the match has been recorded
             updated_position_winner = self.poolbot.get_leaderboard_position(msg_author)
             updated_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
@@ -148,8 +161,10 @@ class RecordCommand(BaseCommand):
             delta_position_winner = abs(updated_position_winner - original_position_winner)
             delta_position_loser = updated_position_loser - original_position_loser
 
+            message = self.victory_message_brief if brief == True else self.victory_message
+
             return self.reply(
-                self.victory_message.format(
+                message.format(
                     winner=self.poolbot.get_username(msg_author),
                     loser=self.poolbot.get_username(defeated_player),
                     delta_elo_winner=delta_elo_winner,
@@ -163,6 +178,10 @@ class RecordCommand(BaseCommand):
                     position_loser=get_ordinal_extension(updated_position_loser),
                     winner_emoji=self._get_position_change_emoji(delta_position_winner),
                     loser_emoji=self._get_position_change_emoji(-delta_position_loser),
+                    old_elo_winner=original_elo_winner,
+                    old_elo_loser=original_elo_loser,
+                    old_position_winner=original_position_winner,
+                    old_position_loser=original_position_loser
                 ),
                 callbacks=['spree']
             )
@@ -177,6 +196,12 @@ class RecordCommand(BaseCommand):
             return self._find_user_mentions(text)[0]
         except IndexError:
             return None
+
+    def _find_briefmode_flag(self, text):
+        """
+        Search for a brief flag in the message text.
+        """
+        return any(noun in text for noun in self.briefmode_flags)
 
     def _victory_noun_in_text(self, text):
         """
