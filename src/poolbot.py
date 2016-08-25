@@ -235,17 +235,17 @@ class PoolBot(object):
         self.session.headers.update(
             {'Authorization': 'Token {token}'.format(token=self.server_token)}
         )
-        
+
     def _get_leaderboard(self):
-        """Retrieves current players positions"""
+        """Retrieves current players positions ordered by their elo score."""
         all_users_elo = {}
-        for user_id, user in self.users.items():
+        for user_id, user in self.users.iteritems():
             player = user['player_profile']
             if player['total_win_count'] or player['total_loss_count']:
                 all_users_elo[user_id] = player['elo']
-            
-        return sorted(all_users_elo, key=all_users_elo.__getitem__, reverse=True)
-        
+
+        return sorted(all_users_elo, key=all_users_elo.get, reverse=True)
+
     def get_leaderboard_position(self, player):
         """Retrieves position for given player"""
         return self._get_leaderboard().index(player) + 1

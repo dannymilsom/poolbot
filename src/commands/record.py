@@ -1,5 +1,7 @@
 import random
 
+from utils import get_ordinal_extension
+
 from .base import BaseCommand
 
 
@@ -52,12 +54,12 @@ class RecordCommand(BaseCommand):
         'Sorry, I was unable to record that result.'
     )
     victory_message = (
-        'Victory recorded for {winner}! {winner} gained {delta_elo_winner} elo '
-        'points, giving a new total of {winner_total}. {winner} has '
-        '{position_winner} place in the leaderboard now (:arrow_up: '
+        'Victory recorded for {winner}! :{emoji}: {winner} gained '
+        '{delta_elo_winner} elo points, giving a new total of {winner_total}. '
+        '{winner} has {position_winner} place in the leaderboard now ({winner_emoji} '
         '{delta_position_winner}). {loser} lost {delta_elo_loser} points, giving '
         'them a new total of {loser_total}. {loser} has {position_loser} place '
-        'in the leaderboard now (:arrow_down: {delta_position_loser}). :{emoji}:'
+        'in the leaderboard now ({loser_emoji} {delta_position_loser}).'
     )
 
     def process_request(self, message):
@@ -157,8 +159,10 @@ class RecordCommand(BaseCommand):
                     emoji=self._get_emojis(),
                     delta_position_winner=delta_position_winner,
                     delta_position_loser=delta_position_loser,
-                    position_winner=updated_position_winner,
-                    position_loser=updated_position_loser,
+                    position_winner=get_ordinal_extension(updated_position_winner),
+                    position_loser=get_ordinal_extension(updated_position_loser),
+                    winner_emoji=self._get_position_change_emoji(delta_position_winner),
+                    loser_emoji=self._get_position_change_emoji(delta_position_loser),
                 ),
                 callbacks=['spree']
             )
@@ -208,6 +212,16 @@ class RecordCommand(BaseCommand):
             elo = 0
 
         return elo
+
+    def _get_position_change_emoji(self, position_change):
+        """Return a emoji to represent a users movement on the leaderboard."""
+        if position_change == 0:
+            emoji = 'left_right_arrow'
+        elif position_change > 0:
+            emoji = 'arrow_up'
+        elif position_change < 0:
+            emoji = 'arrow_down'
+        return ':{emoji}:'.format(emoji=emoji)
 
     def _get_emojis(self):
         """Returns a random emojis to append to the victory reply."""
