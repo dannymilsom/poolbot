@@ -184,20 +184,25 @@ class PoolBot(object):
                 if user['name'] == 'slackbot' or user.get('is_bot', False):
                     continue
 
-                # cache all users in memory too with their player profile
-                if user['id'] in player_profiles.keys():
-                    user_id = user['id']
-                    self.users[user_id] = user
-                    self.set_player_profile(user_id, player_profiles[user_id])
+                user_id = user['id']
 
-                if user['id'] not in player_profiles.keys():
-                    self.session.post(
+                # cache all users in memory too with their player profile
+                # posting data to the server if it does not yet exist
+                try:
+                    player_profile = player_profiles[user_id]
+                except KeyError:
+                    response = self.session.post(
                         player_api_url,
                         data={
                             'name': user['name'],
-                            'slack_id': user['id']
+                            'slack_id': user_id,
                         }
                     )
+                    player_profile = response.json()
+
+                # cache all users in memory too with their player profile
+                self.users[user_id] = user
+                self.set_player_profile(user_id, player_profile)
 
     def store_user(self, user_id):
         """Store a single user in the server side datastore."""
@@ -241,15 +246,20 @@ class PoolBot(object):
         all_users_elo = {}
         for user_id, user in self.users.iteritems():
             player = user['player_profile']
-            if player['total_win_count'] or player['total_loss_count']:
+            if player['active'] and (player['total_win_count'] or player['total_loss_count']):
                 all_users_elo[user_id] = player['elo']
 
         return sorted(all_users_elo, key=all_users_elo.get, reverse=True)
 
     def get_leaderboard_position(self, player):
         """Retrieves position for given player"""
-        return self._get_leaderboard().index(player) + 1
-
+        try:
+            return self._get_leaderboard().index(player) + 1
+        except ValueError:
+            # this probably means that the user ID was not returned in the 
+            # ordered list of leaderboard players because they are have played
+            # a game yet...
+            return None
 
 if __name__ == '__main__':
     bot = PoolBot()
