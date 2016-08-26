@@ -53,6 +53,7 @@ class RecordCommand(BaseCommand):
     not_recorded_message = (
         'Sorry, I was unable to record that result.'
     )
+    # we use this if both players were previously on the leaderboard
     victory_message = (
         'Victory recorded for {winner}! :{emoji}: {winner} gained '
         '{delta_elo_winner} elo points, giving a new total of {winner_total}. '
@@ -60,6 +61,20 @@ class RecordCommand(BaseCommand):
         '{delta_position_winner}). {loser} lost {delta_elo_loser} points, giving '
         'them a new total of {loser_total}. {loser} has {position_loser} place '
         'in the leaderboard now ({loser_emoji} {delta_position_loser}).'
+    )
+    # we combine the following if one or both of the players are new
+    victory_message_prefix = (
+        'Victory recorded for {winner} :{emoji}:! {winner} gained {delta_elo_winner} elo '
+        'points, giving a new total of {winner_total}. {loser} lost '
+        '{delta_elo_loser} points, giving them a new total of {loser_total}.'
+    )
+    victory_leaderboard_message_existing_player = (
+        '{player} has {position_winner} place in the leaderboard now '
+        '(:{emoji}: {delta_position_winner}).'
+    )
+    victory_leaderboard_message_message_new_player = (
+        '{player} has {position_winner} in the leaderboard now after recording '
+        'their first match!'
     )
 
     def process_request(self, message):
@@ -88,6 +103,8 @@ class RecordCommand(BaseCommand):
         original_elo_loser = self._get_elo(defeated_player)
         
         # cache the leaderboard position of each player before recording the win
+        # if either player has not played, this will be None as players without
+        # a game are excluded from the leaderboard
         original_position_winner = self.poolbot.get_leaderboard_position(msg_author)
         original_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
@@ -138,18 +155,43 @@ class RecordCommand(BaseCommand):
             # and store it in the player profile cache
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
             updated_elo_loser = self._get_elo(defeated_player, from_cache=False)
-            
-            # fetch the new leaderboard position after the match has been recorded
-            updated_position_winner = self.poolbot.get_leaderboard_position(msg_author)
-            updated_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
 
             delta_elo_winner = updated_elo_winner - original_elo_winner
             delta_elo_loser = abs(updated_elo_loser - original_elo_loser)
-            delta_position_winner = abs(updated_position_winner - original_position_winner)
-            delta_position_loser = updated_position_loser - original_position_loser
 
-            return self.reply(
-                self.victory_message.format(
+            # fetch the new leaderboard position after the match has been recorded
+            updated_position_winner = self.poolbot.get_leaderboard_position(msg_author)
+            updated_position_loser = self.poolbot.get_leaderboard_position(defeated_player)
+            
+            if original_position_winner is not None:
+                delta_position_winner = abs(updated_position_winner - original_position_winner)
+
+            if original_position_loser is not None:
+                delta_position_loser = updated_position_loser - original_position_loser
+
+            # both players had previous positions on the leaderboard
+            if original_position_winner and original_position_loser:
+                return self.reply(
+                    self.victory_message.format(
+                        winner=self.poolbot.get_username(msg_author),
+                        loser=self.poolbot.get_username(defeated_player),
+                        delta_elo_winner=delta_elo_winner,
+                        delta_elo_loser=delta_elo_loser,
+                        winner_total=updated_elo_winner,
+                        loser_total=updated_elo_loser,
+                        emoji=self._get_emojis(),
+                        delta_position_winner=delta_position_winner,
+                        delta_position_loser=delta_position_loser,
+                        position_winner=get_ordinal_extension(updated_position_winner),
+                        position_loser=get_ordinal_extension(updated_position_loser),
+                        winner_emoji=self._get_position_change_emoji(delta_position_winner),
+                        loser_emoji=self._get_position_change_emoji(-delta_position_loser),
+                    ),
+                    callbacks=['spree']
+                )
+            # one or both of the players will not have a previous position
+            else:
+                msg_prefix = self.victory_message_prefix.format(
                     winner=self.poolbot.get_username(msg_author),
                     loser=self.poolbot.get_username(defeated_player),
                     delta_elo_winner=delta_elo_winner,
@@ -157,15 +199,43 @@ class RecordCommand(BaseCommand):
                     winner_total=updated_elo_winner,
                     loser_total=updated_elo_loser,
                     emoji=self._get_emojis(),
-                    delta_position_winner=delta_position_winner,
-                    delta_position_loser=delta_position_loser,
-                    position_winner=get_ordinal_extension(updated_position_winner),
-                    position_loser=get_ordinal_extension(updated_position_loser),
-                    winner_emoji=self._get_position_change_emoji(delta_position_winner),
-                    loser_emoji=self._get_position_change_emoji(-delta_position_loser),
-                ),
-                callbacks=['spree']
-            )
+                )
+
+                if original_position_winner:
+                    winner_position_msg = self.victory_leaderboard_message_existing_player.format(
+                        player=self.poolbot.get_username(msg_author),
+                        position_winner=get_ordinal_extension(updated_position_winner),
+                        delta_position_winner=delta_position_winner,
+                        emoji=self._get_position_change_emoji(delta_position_winner),
+                    )
+                else:
+                    winner_position_msg = self.victory_leaderboard_message_message_new_player.format(
+                        player=self.poolbot.get_username(msg_author),
+                        position_winner=get_ordinal_extension(updated_position_winner),
+                    )
+
+                if original_position_loser:
+                    loser_position_msg = self.victory_leaderboard_message_existing_player.format(
+                        player=self.poolbot.get_username(defeated_player),
+                        position_winner=get_ordinal_extension(updated_position_loser),
+                        delta_position_winner=delta_position_loser,
+                        emoji=self._get_position_change_emoji(-delta_position_loser),
+                    )
+                else:
+                    loser_position_msg = self.victory_leaderboard_message_message_new_player.format(
+                        player=self.poolbot.get_username(defeated_player),
+                        position_winner=get_ordinal_extension(updated_position_loser),
+                    )
+
+                return self.reply(
+                    '{prefix} {winner_position} {loser_position}'.format(
+                        prefix=msg_prefix,
+                        winner_position=winner_position_msg, 
+                        loser_position=loser_position_msg,
+                    ),
+                    callbacks=['spree']
+                )
+
         else:
             return self.reply(self.not_recorded_message)
         # TODO generate some funny phrase to celebrate the victory
