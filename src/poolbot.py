@@ -246,7 +246,7 @@ class PoolBot(object):
         all_users_elo = {}
         for user_id, user in self.users.iteritems():
             player = user['player_profile']
-            if player['total_win_count'] or player['total_loss_count']:
+            if player['active'] and (player['total_win_count'] or player['total_loss_count']):
                 all_users_elo[user_id] = player['elo']
 
         return sorted(all_users_elo, key=all_users_elo.get, reverse=True)
