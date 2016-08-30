@@ -23,9 +23,9 @@ class ProfileCommand(BaseCommand):
         if not args:
             # fetch the profile data of the message author from cache/API
             try:
-                profile_attrs = self.poolbot.get_player_profile(user_id)
+                user = self.poolbot.users[user_id]
                 return self.reply(
-                    self._get_profile_representation(profile_attrs)
+                    self._get_profile_representation(user)
                 )
             except KeyError:
                 response = self.poolbot.session.get(url)

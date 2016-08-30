@@ -40,6 +40,12 @@ class StatsCommand(BaseCommand):
             return 'Sorry, I was unable to fetch that data.'
 
     def _generate_response_from_cache(self, user_id):
-        """Construct the reply from the cached profile data."""
-        player_profile = self.poolbot.get_player_profile(user_id)
-        return self.response_msg.format(**player_profile)
+        """Construct the reply from the cached user instace."""
+        user = self.poolbot.users[user_id]
+        return self.response_msg.format(
+            name=user.username,
+            total_match_count=user.total_match_count,
+            elo=user.elo,
+            total_win_count=user.total_win_count,
+            total_loss_count=user.total_loss_count,
+        )

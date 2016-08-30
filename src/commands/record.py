@@ -96,7 +96,7 @@ class RecordCommand(BaseCommand):
                 self.no_victory_noun_found_message.format(
                     victory_nouns=victory_nouns
                 )
-            )
+            ) 
 
         # cache the elo score of each player before recording the win
         original_elo_winner = self._get_elo(msg_author)
@@ -169,12 +169,16 @@ class RecordCommand(BaseCommand):
             if original_position_loser is not None:
                 delta_position_loser = updated_position_loser - original_position_loser
 
+            # get the user instances
+            winning_user = self.poolbot.users[msg_author]
+            lossing_user = self.poolbot.users[defeated_player]
+
             # both players had previous positions on the leaderboard
             if original_position_winner and original_position_loser:
                 return self.reply(
                     self.victory_message.format(
-                        winner=self.poolbot.get_username(msg_author),
-                        loser=self.poolbot.get_username(defeated_player),
+                        winner=winning_user.username,
+                        loser=lossing_user.username,
                         delta_elo_winner=delta_elo_winner,
                         delta_elo_loser=delta_elo_loser,
                         winner_total=updated_elo_winner,
@@ -192,8 +196,8 @@ class RecordCommand(BaseCommand):
             # one or both of the players will not have a previous position
             else:
                 msg_prefix = self.victory_message_prefix.format(
-                    winner=self.poolbot.get_username(msg_author),
-                    loser=self.poolbot.get_username(defeated_player),
+                    winner=winning_user.username,
+                    loser=lossing_user.username,
                     delta_elo_winner=delta_elo_winner,
                     delta_elo_loser=delta_elo_loser,
                     winner_total=updated_elo_winner,
@@ -203,34 +207,34 @@ class RecordCommand(BaseCommand):
 
                 if original_position_winner:
                     winner_position_msg = self.victory_leaderboard_message_existing_player.format(
-                        player=self.poolbot.get_username(msg_author),
+                        player=winning_user.username,
                         position_winner=get_ordinal_extension(updated_position_winner),
                         delta_position_winner=delta_position_winner,
                         emoji=self._get_position_change_emoji(delta_position_winner),
                     )
                 else:
                     winner_position_msg = self.victory_leaderboard_message_message_new_player.format(
-                        player=self.poolbot.get_username(msg_author),
+                        player=winning_user.username,
                         position_winner=get_ordinal_extension(updated_position_winner),
                     )
 
                 if original_position_loser:
                     loser_position_msg = self.victory_leaderboard_message_existing_player.format(
-                        player=self.poolbot.get_username(defeated_player),
+                        player=lossing_user.username,
                         position_winner=get_ordinal_extension(updated_position_loser),
                         delta_position_winner=delta_position_loser,
                         emoji=self._get_position_change_emoji(-delta_position_loser),
                     )
                 else:
                     loser_position_msg = self.victory_leaderboard_message_message_new_player.format(
-                        player=self.poolbot.get_username(defeated_player),
+                        player=lossing_user.username,
                         position_winner=get_ordinal_extension(updated_position_loser),
                     )
 
                 return self.reply(
                     '{prefix} {winner_position} {loser_position}'.format(
                         prefix=msg_prefix,
-                        winner_position=winner_position_msg, 
+                        winner_position=winner_position_msg,
                         loser_position=loser_position_msg,
                     ),
                     callbacks=['spree']
@@ -261,11 +265,11 @@ class RecordCommand(BaseCommand):
         """
         if from_cache:
             try:
-                player_profile = self.poolbot.get_player_profile(player)
+                user = self.poolbot.users[player]
             except KeyError:
                 pass # we fallback to fetching via the API
             else:
-                return player_profile['elo']
+                return user.elo
 
         # if fetching from cache was un-successful / not intended, hit the API
         base_url = '/api/player/{player}/'.format(player=player)

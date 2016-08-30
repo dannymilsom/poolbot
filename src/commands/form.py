@@ -38,9 +38,10 @@ class FormCommand(BaseCommand):
         )
 
         if response.status_code == 200:
+            user = self.poolbot.users[user_id]
             return self.reply(
                 'Recent results for {user_name}: `{results}`'.format(
-                    user_name=self.poolbot.users[user_id]['name'],
+                    user_name=user.username,
                     results=response.content
                 )
             )

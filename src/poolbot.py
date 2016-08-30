@@ -10,7 +10,8 @@ import yaml
 
 from slackclient import SlackClient
 
-from utils import MissingConfigurationException
+from users import User
+from utils import MissingConfigurationException, flatten_nested_dict
 
 
 class PoolBot(object):
@@ -201,35 +202,24 @@ class PoolBot(object):
                     player_profile = response.json()
 
                 # cache all users in memory too with their player profile
-                self.users[user_id] = user
-                self.set_player_profile(user_id, player_profile)
-
-    def store_user(self, user_id):
-        """Store a single user in the server side datastore."""
-        user_details = self.client.api_call('users.info', user=user_id)
-        url = self.generate_url('api/player/')
-        self.session.post(
-            url,
-            data={
-                'name': user_details['user']['name'],
-                'slack_id': user_details['user']['id']
-            }
-        )
+                user_profile = flatten_nested_dict(user)
+                user_profile.update(player_profile)
+                self.users[user_id] = User(**user_profile)
 
     def get_username(self, user_id, capitalize=True):
         """Fetch the user name for a slack user given their ID from the in
         memory dictionary of registered users."""
-        name = self.users.get(user_id)['name']
-        return name.title() if capitalize else name
+        username = self.users.get(user_id).username
+        return username.title() if capitalize else username
 
     def get_player_profile(self, user_id):
         """Fetch the cached player profile."""
-        return self.users[user_id]['player_profile']
+        return self.users[user_id]
 
     def set_player_profile(self, user_id, data):
         """Set the cache player profile, capitalizing the name for messages."""
-        data['name'] = data['name'].title()
-        self.users[user_id]['player_profile'] = data
+        user = self.users[user_id]
+        user.update_from_dict(data)
 
     def generate_url(self, path):
         """Join the host portion of the URL with the provided path."""
@@ -243,11 +233,11 @@ class PoolBot(object):
 
     def _get_leaderboard(self):
         """Retrieves current players positions ordered by their elo score."""
-        all_users_elo = {}
-        for user_id, user in self.users.iteritems():
-            player = user['player_profile']
-            if player['total_win_count'] or player['total_loss_count']:
-                all_users_elo[user_id] = player['elo']
+        all_users_elo = {
+            user.slack_id: user.elo for
+            user_id, user in self.users.iteritems() if
+            user.included_in_leaderboard
+        }
 
         return sorted(all_users_elo, key=all_users_elo.get, reverse=True)
 

@@ -93,9 +93,9 @@ class GrannyCommand(BaseCommand):
             'taken {grannies_taken}: ```\n{matches}\n```'
         )
 
-        player_profile = self.poolbot.get_player_profile(user_id)
+        player_profile = self.poolbot.users[user_id]
         return resp_str.format(
-            player=self.poolbot.get_username(user_id),
+            player=player_profile.username,
             grannies_given=player_profile['total_grannies_given_count'],
             grannies_taken=player_profile['total_grannies_taken_count'],
             matches=all_matches

@@ -69,9 +69,10 @@ class SpreeCommand(BaseCommand):
         if response.status_code == 200:
             spree, spree_count = self.calculate_spree(response.content)
             if spree:
+                user = self.poolbot.users[user_id]
                 return self.reply(
                     '{username} {prefix} {spree} {suffix} ({count} consecutive wins)'.format(
-                        username=self.poolbot.get_username(user_id),
+                        username=user.username,
                         prefix=spree[0],
                         spree=spree[1],
                         suffix=spree[2],

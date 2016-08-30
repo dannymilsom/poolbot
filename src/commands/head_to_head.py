@@ -46,7 +46,9 @@ class HeadToHeadCommand(BaseCommand):
             player2_wins = data[player2]
             total_games = player1_wins + player2_wins
             most_wins = player1 if player1_wins > player2_wins else player2
+            most_wins_user = self.poolbot.users[most_wins]
             most_loses = player2 if most_wins == player1 else player1
+            most_loses_user = self.poolbot.users[most_loses]
 
             reply_text = (
                 '{winner} has won {winner_win_count} games. '
@@ -67,8 +69,8 @@ class HeadToHeadCommand(BaseCommand):
                 )
 
             return self.reply(reply_text.format(
-                winner=self.poolbot.get_username(most_wins),
-                loser=self.poolbot.get_username(most_loses),
+                winner=most_wins_user.username,
+                loser=most_loses_user.username,
                 winner_win_count=data[most_wins],
                 loser_win_count=data[most_loses],
                 winner_ratio='{percent:.0f}%'.format(percent=winning_percentage),
