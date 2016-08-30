@@ -9,7 +9,7 @@ class SpreeCommand(BaseCommand):
     help_message = (
         'Use the `spree` command to get any current sprees a player it on. '
     )
-    DEFAULT_LIMIT = 10
+    DEFAULT_LIMIT = 100
 
     SPREE_TABLE = {
         2: ('is on a', 'Double Kill', ''),
@@ -37,10 +37,9 @@ class SpreeCommand(BaseCommand):
                 break
 
         # cover cases where the number is higher than the spree table max
-        if spree > self.HIGHEST_SPREE:
-            spree = self.HIGHEST_SPREE
+        spree_key = self.HIGHEST_SPREE if spree > self.HIGHEST_SPREE else spree
 
-        spree_msg = self.SPREE_TABLE.get(spree, None)
+        spree_msg = self.SPREE_TABLE.get(spree_key, None)
 
         return spree_msg, spree
 
