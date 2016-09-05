@@ -10,16 +10,24 @@ class User(object):
         'joined',
     )
     PLAYER_ATTRS = (
-        'elo',
         'age',
         'active',
         'nickname',
         'country',
+
+        'total_elo',
         'total_win_count',
         'total_loss_count',
         'total_match_count',
         'total_grannies_given_count',
         'total_grannies_taken_count',
+
+        'season_elo',
+        'season_win_count',
+        'season_loss_count',
+        'season_match_count',
+        'season_grannies_given_count',
+        'season_grannies_taken_count',
     )
 
 
