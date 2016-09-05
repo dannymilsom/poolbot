@@ -86,7 +86,7 @@ class RecordCommand(BaseCommand):
         if defeated_player is None:
             return self.reply(self.no_user_found_message)
         elif defeated_player == msg_author:
-            return self.reply(self.cannot_beat_yourself)
+            return self.reply(self.cannot_beat_yourself_message)
 
         # make sure the author is recording a win
         lower_text = message['text'].lower()
