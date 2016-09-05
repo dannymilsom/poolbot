@@ -12,8 +12,10 @@ class StatsCommand(BaseCommand):
         'to retrieve your own stats.'
     )
     response_msg = (
-        '{name} has played {total_match_count} games '
-        '(E {elo} / W {total_win_count} / L {total_loss_count})'
+        '{name} has played {total_match_count} games overall '
+        '(E {total_elo} / W {total_win_count} / L {total_loss_count}) .'
+        'This season they have played {season_match_count} games '
+        '(E {season_elo} / W {season_win_count} / L {season_loss_count}).'
     )
 
     def process_request(self, message):
@@ -44,8 +46,12 @@ class StatsCommand(BaseCommand):
         user = self.poolbot.users[user_id]
         return self.response_msg.format(
             name=user.username,
+            total_elo=user.total_elo,
             total_match_count=user.total_match_count,
-            elo=user.elo,
             total_win_count=user.total_win_count,
             total_loss_count=user.total_loss_count,
+            season_elo=user.season_elo,
+            season_match_count=user.season_match_count,
+            season_win_count=user.season_win_count,
+            season_loss_count=user.season_loss_count,
         )

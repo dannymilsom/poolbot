@@ -269,7 +269,7 @@ class RecordCommand(BaseCommand):
             except KeyError:
                 pass # we fallback to fetching via the API
             else:
-                return user.elo
+                return user.season_elo
 
         # if fetching from cache was un-successful / not intended, hit the API
         base_url = '/api/player/{player}/'.format(player=player)
@@ -278,7 +278,7 @@ class RecordCommand(BaseCommand):
         )
         if response.status_code == 200:
             data = response.json()
-            elo = int(data['elo'])
+            elo = int(data['season_elo'])
 
             # we also use this opportunity to update the cached player profle
             self.poolbot.set_player_profile(player, data)

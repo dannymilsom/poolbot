@@ -55,7 +55,8 @@ class User(object):
         for attr, value in data.iteritems():
             setattr(self, attr, value)
 
-    def included_in_leaderboard(self):
+    def included_in_leaderboard(self, season=True):
         """Determine if the user should be included in the leaderboard."""
-        return self.active and self.total_match_count
+        match_count_field = 'season_match_count' if season else 'total_match_count'
+        return self.active and getattr(self, match_count_field)
 
