@@ -8,7 +8,7 @@ class EloCommand(BaseCommand):
     url_path = 'api/player/elo/'
     help_message = (
       'The `elo` command returns the points that can be won/lost between two '
-      'players.'
+      'players. This always uses the season_elo score.'
     )
 
     def process_request(self, message):
@@ -45,7 +45,7 @@ class EloCommand(BaseCommand):
             for player in data:
                 ret.append(reply_text.format(
                     player=self.poolbot.get_username(player['slack_id']),
-                    elo=player['elo'],
+                    elo=player['season_elo'],
                     elo_win=player['elo_win'],
                     elo_lose=player['elo_lose'],
                     points_win=player['points_win'],

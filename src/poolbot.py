@@ -231,10 +231,16 @@ class PoolBot(object):
             {'Authorization': 'Token {token}'.format(token=self.server_token)}
         )
 
-    def _get_leaderboard(self):
-        """Retrieves current players positions ordered by their elo score."""
+    def _get_leaderboard(self, season=True):
+        """
+        Retrieves current players positions ordered by their elo score.
+
+        By default this uses the season based elo total, but the overall
+        elo count can be used instead by passing season=False.
+        """
+        elo_field = 'season_elo' if season else 'total_elo'
         all_users_elo = {
-            user.slack_id: user.elo for
+            user.slack_id: getattr(user, elo_field) for
             user_id, user in self.users.iteritems() if
             user.included_in_leaderboard
         }
@@ -250,6 +256,7 @@ class PoolBot(object):
             # ordered list of leaderboard players because they are have played
             # a game yet...
             return None
+
 
 if __name__ == '__main__':
     bot = PoolBot()
