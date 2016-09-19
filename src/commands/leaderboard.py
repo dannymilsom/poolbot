@@ -65,7 +65,7 @@ class LeaderboardCommand(BaseCommand):
         leaderboard_table_rows = []
 
         for player in data:  # Go through list
-            if player['total_win_count'] or player['total_loss_count']:  # See if user has played any games
+            if player['{}_win_count'.format(self.elo_field)] or player['{}_loss_count'.format(self.elo_field)]:  # See if user has played any games
                 leaderboard_table_rows.append(leaderboard_row_msg.format(
                     ranking=len(leaderboard_table_rows) + 1,
                     name=player['name'],
