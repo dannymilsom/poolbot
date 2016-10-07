@@ -6,6 +6,8 @@ server_host: <SERVER HOST ADDRESS>
 
 server_token: <SERVER HOST REST FRAMEWORK TOKEN>
 
+nfc_london: <LONDON NFC SLACK ID>
+nfc_bristol: <BRISTOL NFC SLACK ID>
 
 # PLUGIN / COMMANDS
 
