@@ -10,3 +10,4 @@ from profile import ProfileCommand
 from record import RecordCommand
 from stats import StatsCommand
 from spree import SpreeCommand
+from season import SeasonCommand
