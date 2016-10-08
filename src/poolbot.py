@@ -10,7 +10,7 @@ import yaml
 
 from slackclient import SlackClient
 
-from users import User
+from models import User
 from utils import MissingConfigurationException, flatten_nested_dict
 
 
