@@ -12,10 +12,7 @@ class RecordNFCCommand(BaseCommand):
 
     @property
     def nfc_bots(self):
-        return [
-            self.poolbot.config['nfc_london'],  # Ted Lowe
-            self.poolbot.config['nfc_bristol'],  # Clive Everton
-        ]
+        return self.poolbot.config['nfc_bots']
 
     def process_request(self, message):
         """
