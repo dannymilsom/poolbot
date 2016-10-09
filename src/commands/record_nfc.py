@@ -8,7 +8,7 @@ class RecordNFCCommand(BaseCommand):
     """
     This command can works only if the sender is one of the NFC bots
     """
-    command_term = ':nfc:'
+    command_term = ':nfc-red:'
 
     @property
     def nfc_bots(self):
