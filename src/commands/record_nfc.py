@@ -34,7 +34,8 @@ class RecordNFCCommand(BaseCommand):
         message['text'] = "{} <@{}>".format(victory_noun, loser)
         logging.debug(message)
         # Pretend it's a record command!
-        return record.process_request(message)
+        return self.reply("THIS IS A TEST")
+        # return record.process_request(message)
 
     def _find_players(self, text):
         """Parses the message text and returns two user IDs: winner's and loser's."""
