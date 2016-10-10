@@ -98,7 +98,8 @@ class PoolBot(object):
         """Parse each message to determine if poolbot should take an action and
         reply based on the handler rules."""
         handler = None
-        logging.debug(message['text'])
+        if 'text' in message:
+            logging.debug(message['text'])
 
         # if the message is a explicit command for poolbot, action it
         if self.command_for_poolbot(message):
@@ -149,7 +150,7 @@ class PoolBot(object):
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
         # check poolbot was explicitly mentioned
-        if message['user'] in self.config['nfc_bots']:
+        if message.get('user') in self.config['nfc_bots']:
             return True
 
         if not message.get('text', '').startswith(self.bot_mention):
