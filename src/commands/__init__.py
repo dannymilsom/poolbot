@@ -9,6 +9,7 @@ from leaderboard import LeaderboardCommand
 from odds import OddsCommand
 from profile import ProfileCommand
 from record import RecordCommand
+from record_nfc import RecordNFCCommand
 from stats import StatsCommand
 from spree import SpreeCommand
 from season import SeasonCommand
