@@ -149,7 +149,7 @@ class PoolBot(object):
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
         # check poolbot was explicitly mentioned
-        if message['user'] in self.poolbot.config['nfc_bots']:
+        if message['user'] in self.config['nfc_bots']:
             return True
 
         if not message.get('text', '').startswith(self.bot_mention):
