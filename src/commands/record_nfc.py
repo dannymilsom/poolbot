@@ -1,3 +1,4 @@
+import logging
 import random
 
 from .base import BaseCommand
@@ -8,7 +9,7 @@ class RecordNFCCommand(BaseCommand):
     """
     This command can works only if the sender is one of the NFC bots
     """
-    command_term = ':nfc-red:'
+    command_term = 'nfc-red'
 
     @property
     def nfc_bots(self):
