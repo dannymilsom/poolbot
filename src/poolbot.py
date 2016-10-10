@@ -3,7 +3,6 @@
 import os
 import inspect
 import importlib
-import logging
 from requests import Session
 from time import sleep
 from urlparse import urljoin
@@ -13,9 +12,6 @@ from slackclient import SlackClient
 
 from models import User
 from utils import MissingConfigurationException, flatten_nested_dict
-
-
-logging.basicConfig(filename='poolbot.log')
 
 
 class PoolBot(object):
@@ -98,19 +94,15 @@ class PoolBot(object):
         """Parse each message to determine if poolbot should take an action and
         reply based on the handler rules."""
         handler = None
-        if 'text' in message:
-            logging.debug(message['text'])
 
         # if the message is a explicit command for poolbot, action it
         if self.command_for_poolbot(message):
             stripped_text = message['text'].lstrip(self.bot_mention).strip(': ')
-            logging.debug(stripped_text)
 
             for command in self.commands:
                 if command.match_request(stripped_text):
                     handler = command
                     message['text'] = stripped_text
-                    logging.debug(handler)
 
                     break
 
@@ -149,10 +141,11 @@ class PoolBot(object):
 
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
-        # check poolbot was explicitly mentioned
-        if message.get('user') in self.config['nfc_bots']:
+        # check if message comes from a NFC bot
+        if message.get('bot_id') in self.config['nfc_bots']:
             return True
 
+        # check poolbot was explicitly mentioned
         if not message.get('text', '').startswith(self.bot_mention):
             return False
 
