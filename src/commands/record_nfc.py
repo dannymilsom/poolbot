@@ -21,6 +21,7 @@ class RecordNFCCommand(BaseCommand):
         The winner is mentioned first, then the loser.
         """
         msg_author = message['user']
+        logging.debug(self.nfc_bots)
         if msg_author not in self.nfc_bots:
             return
 
@@ -31,7 +32,7 @@ class RecordNFCCommand(BaseCommand):
         victory_noun = random.choice(record.victory_nouns)
         message['user'] = winner
         message['text'] = "{} <@{}>".format(victory_noun, loser)
-
+        logging.debug(message)
         # Pretend it's a record command!
         return record.process_request(message)
 
