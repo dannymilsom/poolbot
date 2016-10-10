@@ -98,7 +98,8 @@ class PoolBot(object):
         """Parse each message to determine if poolbot should take an action and
         reply based on the handler rules."""
         handler = None
-        logging.debug(message['text'])
+        if 'text' in message:
+            logging.debug(message['text'])
 
         # if the message is a explicit command for poolbot, action it
         if self.command_for_poolbot(message):
