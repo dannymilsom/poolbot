@@ -1,5 +1,6 @@
 from challenge import ChallengeCommand
 from elo import EloCommand
+from elo_history import EloHistoryCommand
 from form import FormCommand
 from granny import GrannyCommand
 from head_to_head import HeadToHeadCommand
@@ -10,3 +11,4 @@ from profile import ProfileCommand
 from record import RecordCommand
 from stats import StatsCommand
 from spree import SpreeCommand
+from season import SeasonCommand

@@ -8,9 +8,10 @@ class MissingConfigurationException(Exception):
     pass
 
 
-def format_datetime_to_date(date):
+def format_datetime_to_date(date, format_date=True):
     """Returns only the date representation of a datetime string."""
-    return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").date()
+    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").date()
+    return date.strftime("%d %b %Y") if format_date else date
 
 
 def get_ordinal_extension(number):
