@@ -18,7 +18,7 @@ class BaseCommand(object):
         beginning of the text passed as an argument, to avoid the overhead of
         checking in each commands match_request() method."""
         first_word = text.strip().split(' ')[0]
-        return first_word.lower().startswith(self.command_term)
+        return first_word == self.command_term
 
     def process_request(self, message):
         """Perform the action associated with the command, and return a reply
