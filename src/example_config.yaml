@@ -8,8 +8,8 @@ server_token: <SERVER HOST REST FRAMEWORK TOKEN>
 
 # slack IDs of all NFC bots
 nfc_bots:
-  - U123
-  - U456
+  - <BOT SLACK ID>
+  - <BOT SLACK ID>
 
 # PLUGIN / COMMANDS
 
