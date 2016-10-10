@@ -149,13 +149,13 @@ class PoolBot(object):
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
         # check poolbot was explicitly mentioned
+        if message['user'] in self.poolbot.config['nfc_bots']:
+            return True
+
         if not message.get('text', '').startswith(self.bot_mention):
             return False
 
         return True
-
-        # verify poolbot is in the channel where the message was posted
-        return message.get('channel') in self.poolbot_channels
 
     def get_channel(self, channel_id):
         """Retrieve the channel instance based on the ID provided."""
