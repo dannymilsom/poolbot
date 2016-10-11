@@ -6,10 +6,8 @@ server_host: <SERVER HOST ADDRESS>
 
 server_token: <SERVER HOST REST FRAMEWORK TOKEN>
 
-# slack IDs of all NFC bots
-nfc_bots:
-  - <BOT SLACK ID>
-  - <BOT SLACK ID>
+log_filename: poolbot.log
+log_level: 10 # debug
 
 # PLUGIN / COMMANDS
 
@@ -21,3 +19,8 @@ record_emojis:
   - champagne
   - muscle
   - boom
+
+# slack IDs of all NFC bots
+nfc_bots:
+  - <BOT SLACK ID>
+  - <BOT SLACK ID>

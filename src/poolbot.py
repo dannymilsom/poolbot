@@ -7,6 +7,7 @@ from requests import Session
 from time import sleep
 from urlparse import urljoin
 import yaml
+import logging
 
 from slackclient import SlackClient
 
@@ -26,6 +27,9 @@ class PoolBot(object):
         # load config settings from yaml file
         self.load_config()
 
+        # point the logger to a filepath
+        self.setup_logging()
+
         # connect to the slack websocket
         self.client = SlackClient(self.api_token)
 
@@ -41,6 +45,12 @@ class PoolBot(object):
 
         # because we will compare it regularly, cache the bot mention string
         self.bot_mention = '<@{bot_id}>'.format(bot_id=self.bot_id)
+
+    def setup_logging(self):
+        """Configure the logger settings."""
+        log_filename = self.config['log_filename']
+        log_level = self.config['log_level']
+        logging.basicConfig(filename=log_filename, level=log_level)
 
     def load_config(self):
         """Load the configuration settings from a YAML file."""
@@ -86,7 +96,6 @@ class PoolBot(object):
         self.client.rtm_connect()
         while True:
             for message in self.client.rtm_read():
-                print message
                 self.read_input(message)
                 sleep(1)
 
@@ -97,6 +106,7 @@ class PoolBot(object):
 
         # if the message is a explicit command for poolbot, action it
         if self.command_for_poolbot(message):
+            logging.debug("Message identified for %s", message)
             stripped_text = message['text'].lstrip(self.bot_mention).strip(': ')
 
             for command in self.commands:
