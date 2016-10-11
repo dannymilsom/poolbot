@@ -48,8 +48,8 @@ class PoolBot(object):
 
     def setup_logging(self):
         """Configure the logger settings."""
-        log_filename = self.config['log_filename']
-        log_level = self.config['log_level']
+        log_filename = self.config.get('log_filename', 'poolbot.log')
+        log_level = self.config.get('log_level', logging.DEBUG)
         logging.basicConfig(filename=log_filename, level=log_level)
 
     def load_config(self):
