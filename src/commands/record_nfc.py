@@ -22,12 +22,12 @@ class RecordNFCCommand(BaseCommand):
         msg_author = message['bot_id']
 
         if msg_author not in self.nfc_bots:
-            return
+            return self.reply('Only NFC bots can use this command')
 
         try:
             winner, loser = self._find_players(message['text'])
         except ValueError:  # safety check just in case NFC bot sends a wrong text
-            return '', []
+            return self.reply("Unable to record game via NFC.")
 
         # Fake the record command
         record = RecordCommand(poolbot=self.poolbot)
