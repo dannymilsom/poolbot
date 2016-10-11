@@ -3,16 +3,20 @@
 import os
 import inspect
 import importlib
-from requests import Session
+import logging
 from time import sleep
 from urlparse import urljoin
+
+from requests import Session
 import yaml
-import logging
 
 from slackclient import SlackClient
 
 from models import User
-from utils import MissingConfigurationException, flatten_nested_dict
+from utils import (
+    MissingConfigurationException,
+    flatten_nested_dict,
+)
 
 
 class PoolBot(object):
