@@ -97,7 +97,7 @@ class EloHistoryCommand(BaseCommand):
         ])
 
         # prefix a + sign if positive
-        if today_elo_net:
+        if today_elo_net > 0:
             today_elo_net = "+ {elo_net}".format(elo_net=today_elo_net)
 
         return today_elo_net
@@ -149,7 +149,7 @@ class EloHistoryCommand(BaseCommand):
         ])
 
         # prefix a + sign if positive
-        if month_elo_net:
+        if month_elo_net > 0:
             month_elo_net = "+ {elo_net}".format(elo_net=month_elo_net)
 
         return month_elo_net
