@@ -54,7 +54,10 @@ class SeasonCommand(BaseCommand):
                 )
             else:
                 season_player_url = self.poolbot.generate_url('api/season-player/')
-                get_params = {'season': season['pk']}
+                get_params = {
+                    'season': season['pk'],
+                    'ordering': '-elo_score'
+                }
                 response = self.poolbot.session.get(
                     season_player_url,
                     params=get_params
