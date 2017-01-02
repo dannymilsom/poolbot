@@ -13,7 +13,7 @@ class StatsCommand(BaseCommand):
     )
     response_msg = (
         '{name} has played {total_match_count} games overall '
-        '(E {total_elo} / W {total_win_count} / L {total_loss_count}) .'
+        '(E {total_elo} / W {total_win_count} / L {total_loss_count}). '
         'This season they have played {season_match_count} games '
         '(E {season_elo} / W {season_win_count} / L {season_loss_count}).'
     )
