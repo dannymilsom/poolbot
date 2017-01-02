@@ -1,22 +1,20 @@
-class BaseReaction(object):
-
-    url_path = ''
+class Handler(object):
+    """Base class for handlers which defines the interface to implement."""
 
     def __init__(self, poolbot):
-        """Make poolbot available to all reactions."""
+        """Make poolbot available to all handlers."""
         self.poolbot = poolbot
 
-    def match_request(self, message):
-        """Return a boolean to indicate if the message should be processed
-        by this handler."""
+    def match_request(self, text):
+        """Return a boolean to determine if this handler should process the message."""
         return NotImplemented()
 
     def process_request(self, message):
-        """Return a message which poolbot should reply to the channel with. This
-        method is only called if the match_request() method returns True."""
+        """Determine an action to take based on the message details."""
         return NotImplemented()
 
     def reply(self, message, callbacks=None):
+        """Return a message to the channel and call further commands via callbacks.."""
         if callbacks is None:
             callbacks = []
         return (message, callbacks)

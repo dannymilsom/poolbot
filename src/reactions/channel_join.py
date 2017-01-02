@@ -1,9 +1,8 @@
-from base import BaseReaction
-
+from handler import Handler
 from utils import get_ordinal_extension
 
 
-class ChannelJoinReaction(BaseReaction):
+class ChannelJoinReaction(Handler):
     """Welcome new users to the channel with poolbot monitoring messages."""
 
     url_path = 'api/player/'

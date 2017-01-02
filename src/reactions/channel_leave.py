@@ -1,9 +1,8 @@
-from base import BaseReaction
-
+from handler import Handler
 from utils import get_ordinal_extension
 
 
-class ChannelLeaveReaction(BaseReaction):
+class ChannelLeaveReaction(Handler):
     """Say goodbye to users when they leave the room."""
 
     def match_request(self, message):

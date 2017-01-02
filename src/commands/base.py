@@ -1,16 +1,14 @@
 import re
 
+from handler import Handler
 
-class BaseCommand(object):
+
+class BaseCommand(Handler):
 
     help_message = 'No help available...'
     url_path = ''
     command_term = None
     mention_regex = '<@[a-zA-Z0-9]+>'
-
-    def __init__(self, poolbot):
-        """Make poolbot available to all commands."""
-        self.poolbot = poolbot
 
     def match_request(self, text):
         """Return a boolean to indicate if the message is a command directed
@@ -19,16 +17,6 @@ class BaseCommand(object):
         checking in each commands match_request() method."""
         first_word = text.strip().split(' ')[0]
         return first_word == self.command_term
-
-    def process_request(self, message):
-        """Perform the action associated with the command, and return a reply
-        for poolbot to post back to the channel."""
-        return NotImplemented()
-
-    def reply(self, message, callbacks=None):
-        if callbacks is None:
-            callbacks = []
-        return (message, callbacks)
 
     def setup(self):
         """Perform some actions when the poolbot client loads, in preperation
@@ -41,11 +29,6 @@ class BaseCommand(object):
         user_mentions = re.findall(self.mention_regex, text)
         user_ids = [mention.strip('@<>') for mention in user_mentions]
         return [user_id for user_id in user_ids if user_id != self.poolbot.bot_id]
-
-    def _generate_url(self, **kwargs):
-        """Join the host portion of the URL with the provided command path."""
-        path = self.url_path.format(**kwargs)
-        return self.poolbot.generate_url(path)
 
     def _strip_poolbot_from_message(self, message):
         """Return the message text with the poolbot mention removed."""
