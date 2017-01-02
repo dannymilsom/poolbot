@@ -90,7 +90,7 @@ class PoolBot(object):
                 if inspect.isclass(obj):
                     getattr(self, plugin_dir).append(obj(self))
 
-        # some commands ralso equire some setup work before they can be used
+        # some commands also equire some setup work before they can be used
         for command in self.commands:
             command.setup()
 
