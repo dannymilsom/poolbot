@@ -19,6 +19,11 @@ class BaseReaction(object):
         method is only called if the match_request() method returns True."""
         return NotImplemented()
 
+    def reply(self, message, callbacks=None):
+        if callbacks is None:
+            callbacks = []
+        return (message, callbacks)
+
     def _generate_url(self, **kwargs):
         """Join the host portion of the URL with the provided command path."""
         path = self.url_path.format(**kwargs)
