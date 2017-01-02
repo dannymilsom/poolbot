@@ -155,6 +155,11 @@ class PoolBot(object):
 
     def command_for_poolbot(self, message):
         """Determine if the message contains a command for poolbot."""
+        # if the message has a subtype it will refer to an action
+        # outside of a normal message - for example a user leaving
+        if 'subtype' in message:
+            return False
+
         # check if message comes from a NFC bot
         if message.get('bot_id') in self.config['nfc_bots']:
             return True
