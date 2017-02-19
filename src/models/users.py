@@ -6,7 +6,7 @@ class User(object):
     USER_ATTRS = (
         'slack_id',
         'name',
-        'full_name',
+        'real_name',
         'is_bot',
         'joined',
     )
