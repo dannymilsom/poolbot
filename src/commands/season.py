@@ -9,7 +9,7 @@ class SeasonCommand(BaseCommand):
 
     command_term = 'seasons'
     url_path = 'api/season/'
-    reply_template = "{name}: {start_date} until {end_date}"
+    reply_template = "{name}: {start_date} until {end_date}: Won by {winner_name}"
     default_reply = "Sorry, I was unable to get the season data!"
     help_message = (
         "To view a season in more detail, use the syntax `@poolbot <seasonname>`."
@@ -73,6 +73,14 @@ class SeasonCommand(BaseCommand):
 
     def format_season_response(self, data):
         """Format the season list response."""
+
+        # we want to show the human readable name for the player, not their
+        # PK which is what the API returns...
+        for season in data:
+            season['winner_name'] = self.poolbot.users.get(
+                season['winner'], 'TBC' # this should be the in progress season
+            )
+
         return "\n".join(
             self.reply_template.format(**season) for season in data
         )
