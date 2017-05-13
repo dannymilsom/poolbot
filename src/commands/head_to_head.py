@@ -13,8 +13,9 @@ class HeadToHeadCommand(BaseCommand):
     url_path = 'api/match/head_to_head/'
     help_message = (
         'Use the `head-to-head` command to see all results between two players. '
-        'For example, `@poolbot head-to-head @danny @marin` will return number '
-        'of wins for each player, and the details of their last five matches. '
+        'For example, `@poolbot head-to-head @danny @martin` will return number '
+        'of wins for each player, and the details of their last ten matches by '
+        'default. You can look further back by passing an extra integer arg. '
         'If you want to see the head-to-head between yourself and another '
         'player, passing your own name is optional.'
     )
@@ -32,11 +33,22 @@ class HeadToHeadCommand(BaseCommand):
         except IndexError:
             player2 = message['user']
 
+        # now try to see if the user want a larger history than the default set,
+        # by removing the mentions and using the first remaining argument
+        limit = 10
+        command_args = self._command_args(message, include_user_mentions=False)
+        if command_args:
+            try:
+                limit = int(command_args[0])
+            except ValueError:
+                pass
+
         response = self.poolbot.session.get(
             self._generate_url(),
             params={
                 'player1': player1,
                 'player2': player2,
+                'limit': limit,
             }
         )
 
@@ -44,7 +56,7 @@ class HeadToHeadCommand(BaseCommand):
             data = response.json()
             player1_wins = data[player1]
             player2_wins = data[player2]
-            total_games = player1_wins + player2_wins
+            total_games = data['total_count']
             most_wins = player1 if player1_wins > player2_wins else player2
             most_wins_user = self.poolbot.users[most_wins]
             most_loses = player2 if most_wins == player1 else player1
