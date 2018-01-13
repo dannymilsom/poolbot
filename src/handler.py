@@ -14,7 +14,7 @@ class Handler(object):
         return NotImplemented()
 
     def reply(self, message, callbacks=None):
-        """Return a message to the channel and call further commands via callbacks.."""
+        """Return a message to the channel and call further commands via callbacks."""
         if callbacks is None:
             callbacks = []
         return (message, callbacks)
