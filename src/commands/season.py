@@ -9,8 +9,9 @@ class SeasonCommand(BaseCommand):
 
     command_term = 'seasons'
     url_path = 'api/season/'
-    reply_template = "{name}: {start_date} until {end_date}: Won by {winner_name}"
-    default_reply = "Sorry, I was unable to get the season data!"
+    active_list_reply = "{name} ({start_date} - {end_date}) *{winner_name}* is currently top"
+    inactive_list_reply = "{name} ({start_date} - {end_date}) Won by *{winner_name}*"
+    default_reply = "Sorry, I was unable to get the season data."
     help_message = (
         "To view a season in more detail, use the syntax `@poolbot <seasonname>`."
     )
@@ -32,11 +33,11 @@ class SeasonCommand(BaseCommand):
     def season_list(self):
         """Find all season instances and return them in a formatted list"""
         season_url = self._generate_url()
-        get_params = {'ordering': 'end_date'}
+        get_params = {'ordering': '-end_date'}
         response = self.poolbot.session.get(season_url, params=get_params)
 
         if response.status_code == 200:
-            return self.format_season_response(response.json())
+            return self.format_season_list_response(response.json())
 
     def season_detail(self, season_name):
         """Find all season player instances and format into a leaderboard."""
@@ -71,7 +72,7 @@ class SeasonCommand(BaseCommand):
             if season['name'] == season_name:
                 return season
 
-    def format_season_response(self, data):
+    def format_season_list_response(self, data):
         """Format the season list response."""
 
         # we want to show the human readable name for the player, not their
@@ -82,7 +83,10 @@ class SeasonCommand(BaseCommand):
             )
 
         return "\n".join(
-            self.reply_template.format(**season) for season in data
+            self.active_list_reply.format(**season) if
+            season['active'] else
+            self.inactive_list_reply.format(**season) for
+            season in data
         )
 
     def format_season_player_responses(self, season, season_player_data):
