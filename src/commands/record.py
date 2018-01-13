@@ -83,7 +83,7 @@ class RecordCommand(BaseCommand):
 
         # only ever allow wins to be recorded in the public channel
         if message['channel'] != self.poolbot.config['slack_channel_id']:
-            self.reply("You can only record matches in the public channel.")
+            return self.reply("Sorry hombre, uou can only record matches in the public channel.")
 
         # detect the defeated player, ensuring a user does not beat themself
         defeated_player = self._find_defeated_player(message['text'])
