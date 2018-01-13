@@ -120,37 +120,6 @@ class RecordCommand(BaseCommand):
 
         if response.status_code == 201:
 
-            # also check if we need to update an active challenge, so
-            # fetch the challenge instance for the room
-            # response = self.poolbot.session.get(
-            #     self.poolbot.generate_url('api/challenge'),
-            #     params={
-            #         'channel': message['channel'],
-            #     }
-            # )
-            # if response.status_code == 200:
-            #     # see if the two players match
-            #     data = response.json()
-            #     if len(data):
-            #         challenge_players = (
-            #             data[0]['initiator'],
-            #             data[0]['challenger']
-            #         )
-            #         if msg_author in challenge_players and defeated_player in challenge_players:
-            #             # bingo - update the players now the result is recorded
-            #             challenge_pk = data[0]['id']
-            #             response = self.poolbot.session.patch(
-            #                 self.poolbot.generate_url(
-            #                     'api/challenge/{challenge_pk}/'.format(
-            #                         challenge_pk=challenge_pk
-            #                     )
-            #                 ),
-            #                 data={
-            #                     'initiator': '',
-            #                     'challenger': ''
-            #                 }
-            #             )
-
             # fetch the new elo score after the match has been recorded
             # and store it in the player profile cache
             updated_elo_winner = self._get_elo(msg_author, from_cache=False)
