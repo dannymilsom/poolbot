@@ -6,6 +6,8 @@ server_host: <SERVER HOST ADDRESS>
 
 server_token: <SERVER HOST REST FRAMEWORK TOKEN>
 
+slack_channel_id: <SLACK CHANNEL ID>
+
 log_filename: poolbot.log
 log_level: 10 # debug
 
